@@ -386,7 +386,8 @@ export default function CheckoutPage() {
                   Card
                 </button>
               )}
-              {paymentSettings.accept_cash && isASAPPickup && (
+              {/* Remove cash option for ASAP pickup */}
+              {paymentSettings.accept_cash && !isASAPPickup && (
                 <button
                   type="button"
                   onClick={() => setPaymentMethod('cash')}
