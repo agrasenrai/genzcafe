@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent", // Better for notched devices
     title: "GenZ Cafe",
   },
 };
@@ -20,9 +20,10 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 1, // Prevent zoom on mobile (better for fixed layouts)
+  userScalable: false, // Disable pinch-to-zoom (cleaner mobile experience)
   themeColor: '#000000',
+  viewportFit: 'cover', // Important: allows content to extend into safe areas
 };
 
 export default function RootLayout({
@@ -32,7 +33,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} antialiased bg-gray-50 text-gray-900 min-h-screen`}>
+      <head>
+        {/* Mobile-specific meta tags */}
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+      </head>
+      <body className={`${inter.className} antialiased bg-gray-50 text-gray-900`}>
         <AuthProvider>
           <CartProvider>
             {children}
