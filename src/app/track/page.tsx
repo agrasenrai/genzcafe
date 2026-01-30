@@ -258,7 +258,16 @@ function TrackOrderContent() {
                   <div className="mb-6">
                     <h2 className="text-sm font-medium text-gray-700 mb-3">Recent Orders</h2>
                     <div className="space-y-3">
-                      {recentOrders.map((recentOrder) => (
+                      {/* Show only the latest order per id */}
+                      {Array.from(
+                        recentOrders
+                          .sort((a, b) => b.expiresAt - a.expiresAt)
+                          .reduce((map, order) => {
+                            if (!map.has(order.id)) map.set(order.id, order);
+                            return map;
+                          }, new Map()),
+                        ([, order]) => order
+                      ).map((recentOrder) => (
                         <button
                           key={recentOrder.id}
                           onClick={async () => {

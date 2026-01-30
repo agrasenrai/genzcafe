@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { playNotificationSound } from '@/lib/utils/notificationSound';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import { updateOrderStatus } from '@/lib/supabase/orders';
@@ -58,6 +59,10 @@ export default function OrdersPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<OrderWithFeedback | null>(null);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  // Notification state
+  const prevOrderIdsRef = useRef<Set<string>>(new Set());
+  const [showNewOrderAlert, setShowNewOrderAlert] = useState(false);
+  const alertTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchOrders = useCallback(async () => {
     setLoading(true);
@@ -87,7 +92,7 @@ export default function OrdersPage() {
         }
         
         // Get item feedback
-        let itemsFeedbackData = null;
+        let itemsFeedbackData: Array<{ item_name: string; rating: number; comment?: string }> = [];
         try {
           const itemsFeedbackRaw = await getItemsFeedback(order.id);
           if (itemsFeedbackRaw && itemsFeedbackRaw.length > 0) {
@@ -123,7 +128,7 @@ export default function OrdersPage() {
 
   useEffect(() => {
     fetchOrders();
-    
+
     // Set up real-time subscription for new orders
     const subscription = supabase
       .channel('orders')
@@ -135,8 +140,7 @@ export default function OrdersPage() {
           table: 'orders'
         },
         (payload) => {
-          console.log('Order change received:', payload);
-          // Refresh orders when there's any change
+          // We'll fetch orders, then detect new ones
           fetchOrders();
         }
       )
@@ -145,8 +149,33 @@ export default function OrdersPage() {
     // Cleanup subscription on component unmount
     return () => {
       subscription.unsubscribe();
+      if (alertTimeoutRef.current) clearTimeout(alertTimeoutRef.current);
     };
   }, [fetchOrders]);
+
+  // Detect new pending orders and play sound
+  useEffect(() => {
+    if (loading) return;
+    const currentPending = orders.filter(o => o.status === 'pending');
+    const currentIds = new Set(currentPending.map(o => o.id));
+    const prevIds = prevOrderIdsRef.current;
+
+    // Only play sound for new pending orders (not for status changes or refresh)
+    let newOrderDetected = false;
+    for (const id of currentIds) {
+      if (!prevIds.has(id)) {
+        newOrderDetected = true;
+        break;
+      }
+    }
+    if (newOrderDetected && currentPending.length > 0) {
+      playNotificationSound();
+      setShowNewOrderAlert(true);
+      if (alertTimeoutRef.current) clearTimeout(alertTimeoutRef.current);
+      alertTimeoutRef.current = setTimeout(() => setShowNewOrderAlert(false), 2500);
+    }
+    prevOrderIdsRef.current = currentIds;
+  }, [orders, loading]);
 
   // Filter orders by status
   const filteredOrders = orders.filter(order => {
@@ -158,7 +187,9 @@ export default function OrdersPage() {
   });
 
   // Handle status update
-  const handleStatusUpdate = async (orderId: string, newStatus: string) => {
+  type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'out_for_delivery' | 'delivered' | 'cancelled' | 'awaiting_payment';
+  
+  const handleStatusUpdate = async (orderId: string, newStatus: OrderStatus) => {
     try {
       setUpdatingStatus(true);
       await updateOrderStatus(orderId, newStatus);
@@ -180,18 +211,22 @@ export default function OrdersPage() {
   };
 
   // Get the next status in the flow
-  const getNextStatus = (currentStatus: string) => {
-    const statusFlow = {
+  const getNextStatus = (currentStatus: OrderStatus): OrderStatus | undefined => {
+    const statusFlow: Record<OrderStatus, OrderStatus | undefined> = {
       'pending': 'confirmed',
       'confirmed': 'preparing',
       'preparing': 'ready',
-      'ready': 'delivered'
+      'ready': 'delivered',
+      'out_for_delivery': undefined,
+      'delivered': undefined,
+      'cancelled': undefined,
+      'awaiting_payment': undefined
     };
-    return statusFlow[currentStatus as keyof typeof statusFlow];
+    return statusFlow[currentStatus];
   };
 
   // Quick status update
-  const handleQuickStatusUpdate = async (e: React.MouseEvent, orderId: string, currentStatus: string) => {
+  const handleQuickStatusUpdate = async (e: React.MouseEvent, orderId: string, currentStatus: OrderStatus) => {
     e.stopPropagation(); // Prevent opening the modal
     const nextStatus = getNextStatus(currentStatus);
     if (nextStatus) {
@@ -220,7 +255,14 @@ export default function OrdersPage() {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 relative">
+      {/* Visual Alert for New Order */}
+      {showNewOrderAlert && (
+        <div className="fixed top-6 right-6 z-50 flex items-center gap-2 bg-yellow-200 text-yellow-900 px-4 py-2 rounded shadow-lg animate-bounce">
+          <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" /></svg>
+          <span className="font-semibold">New Order Received!</span>
+        </div>
+      )}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Order Management</h1>
         <p className="text-gray-600">Manage your restaurant orders</p>
@@ -293,7 +335,7 @@ export default function OrdersPage() {
                   Status
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Feedback
+                  Pickup Time
                 </th>
               </tr>
             </thead>
@@ -312,6 +354,9 @@ export default function OrdersPage() {
                       <span className="text-sm font-medium text-gray-900">#{order.otp}</span>
                       <span className="text-sm text-gray-500">{formatDate(order.created_at)}</span>
                       <span className="text-sm text-gray-500">{formatPrice(order.final_total)}</span>
+                      {order.scheduled_time && (
+                        <span className="text-xs text-blue-700 mt-1">Pickup: {new Date(order.scheduled_time).toLocaleString()}</span>
+                      )}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -327,32 +372,52 @@ export default function OrdersPage() {
                       }`}>
                         {order.status.charAt(0).toUpperCase() + order.status.slice(1).replace('_', ' ')}
                       </span>
-                      {getNextStatus(order.status) && !['delivered', 'cancelled'].includes(order.status) && (
+                      {getNextStatus(order.status as OrderStatus) && !['delivered', 'cancelled'].includes(order.status) && (
                         <button
-                          onClick={(e) => handleQuickStatusUpdate(e, order.id, order.status)}
+                          onClick={(e) => handleQuickStatusUpdate(e, order.id, order.status as OrderStatus)}
                           disabled={updatingStatus}
                           className={`px-2 py-1 text-xs font-medium rounded-full bg-black text-white hover:bg-gray-800 transition-colors ${
                             updatingStatus ? 'opacity-50 cursor-not-allowed' : ''
                           }`}
                         >
-                          → {getNextStatus(order.status)?.charAt(0).toUpperCase() + getNextStatus(order.status)?.slice(1)}
+                            → {getNextStatus(order.status as OrderStatus)
+                              ? getNextStatus(order.status as OrderStatus)!.charAt(0).toUpperCase() + getNextStatus(order.status as OrderStatus)!.slice(1)
+                              : ''}
                         </button>
                       )}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {order.feedback ? (
-                      <div>
-                        {renderStars(order.feedback.rating)}
-                        {order.feedback.comment && (
-                          <p className="text-xs text-gray-500 mt-1 truncate max-w-[150px]">
-                            "{order.feedback.comment}"
-                          </p>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-xs text-gray-400">No feedback</span>
-                    )}
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-blue-700">
+                        {order.scheduled_time ? new Date(order.scheduled_time).toLocaleString() : 'N/A'}
+                      </span>
+                      {order.scheduled_time && (
+                        <button
+                          className="ml-1 px-2 py-1 rounded bg-blue-100 text-blue-700 hover:bg-blue-200 text-xs font-bold"
+                          title="Add 10 minutes to pickup time"
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            const newTime = new Date(order.scheduled_time);
+                            newTime.setMinutes(newTime.getMinutes() + 10);
+                            const { error } = await supabase
+                              .from('orders')
+                              .update({ scheduled_time: newTime.toISOString() })
+                              .eq('id', order.id);
+                            if (!error) {
+                              setOrders(orders => orders.map(o => o.id === order.id ? { ...o, scheduled_time: newTime.toISOString() } : o));
+                              if (selectedOrder && selectedOrder.id === order.id) {
+                                setSelectedOrder({ ...selectedOrder, scheduled_time: newTime.toISOString() });
+                              }
+                            } else {
+                              alert('Failed to update pickup time');
+                            }
+                          }}
+                        >
+                          +
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -389,14 +454,41 @@ export default function OrdersPage() {
                   <p className="mt-1">Date: {formatDate(selectedOrder.created_at)}</p>
                   <p>Time: {formatTime(selectedOrder.created_at)}</p>
                   <p>Type: {selectedOrder.order_type === 'pickup' ? 'Pickup' : 'Delivery'}</p>
-                  {selectedOrder.scheduled_time && <p>Scheduled: {selectedOrder.scheduled_time === '' ? 'ASAP' : selectedOrder.scheduled_time}</p>}
+                  {selectedOrder.scheduled_time && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-600">Pickup Time:</span>{' '}
+                      <span>{new Date(selectedOrder.scheduled_time).toLocaleString()}</span>
+                      <button
+                        className="ml-2 px-2 py-1 rounded bg-blue-100 text-blue-700 hover:bg-blue-200 text-xs font-bold"
+                        title="Add 10 minutes to pickup time"
+                        onClick={async () => {
+                          const newTime = new Date(selectedOrder.scheduled_time);
+                          newTime.setMinutes(newTime.getMinutes() + 10);
+                          // Update in DB
+                          const { error } = await supabase
+                            .from('orders')
+                            .update({ scheduled_time: newTime.toISOString() })
+                            .eq('id', selectedOrder.id);
+                          if (!error) {
+                            setSelectedOrder({ ...selectedOrder, scheduled_time: newTime.toISOString() });
+                            // Also update in orders list
+                            setOrders(orders => orders.map(o => o.id === selectedOrder.id ? { ...o, scheduled_time: newTime.toISOString() } : o));
+                          } else {
+                            alert('Failed to update pickup time');
+                          }
+                        }}
+                      >
+                        +
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
               
               <div className="mb-4">
                 <h4 className="text-sm font-medium text-gray-500 mb-2">Status</h4>
                 <div className="flex flex-wrap gap-2">
-                  {['pending', 'confirmed', 'preparing', 'ready', 'delivered', 'cancelled'].map((status) => (
+                  {(['pending', 'confirmed', 'preparing', 'ready', 'delivered', 'cancelled'] as OrderStatus[]).map((status) => (
                     <button
                       key={status}
                       onClick={() => !updatingStatus && handleStatusUpdate(selectedOrder.id, status)}

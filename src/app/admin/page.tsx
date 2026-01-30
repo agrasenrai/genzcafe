@@ -1,12 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { playNotificationSound } from '@/lib/utils/notificationSound';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import { formatPrice } from '@/lib/utils/helpers';
 import { getRestaurantSettings } from '@/lib/supabase/settings';
 
 export default function AdminDashboard() {
+  const prevOrderIdsRef = useRef<Set<string>>(new Set());
+  const [showNewOrderAlert, setShowNewOrderAlert] = useState(false);
+  const alertTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [stats, setStats] = useState({
     totalOrders: 0,
     pendingOrders: 0,
@@ -31,55 +35,47 @@ export default function AdminDashboard() {
     async function fetchDashboardData() {
       try {
         setIsLoading(true);
-        
         // Get counts
         const { count: totalOrders, error: ordersError } = await supabase
           .from('orders')
           .select('*', { count: 'exact', head: true });
-          
         const { count: pendingOrders, error: pendingError } = await supabase
           .from('orders')
           .select('*', { count: 'exact', head: true })
           .in('status', ['pending', 'confirmed', 'preparing', 'ready', 'out_for_delivery']);
-          
         const { count: totalMenuItems, error: menuError } = await supabase
           .from('menu_items')
           .select('*', { count: 'exact', head: true });
-          
         const { count: totalCategories, error: categoriesError } = await supabase
           .from('menu_categories')
           .select('*', { count: 'exact', head: true });
-        
+
         // Get revenue stats
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        
         const weekStart = new Date();
         weekStart.setDate(weekStart.getDate() - 7);
         weekStart.setHours(0, 0, 0, 0);
-        
         const monthStart = new Date();
         monthStart.setMonth(monthStart.getMonth() - 1);
         monthStart.setHours(0, 0, 0, 0);
-        
+
         const { data: todayOrders, error: todayError } = await supabase
           .from('orders')
           .select('final_total')
           .gte('created_at', today.toISOString())
           .not('status', 'eq', 'cancelled');
-        
         const { data: weekOrders, error: weekError } = await supabase
           .from('orders')
           .select('final_total')
           .gte('created_at', weekStart.toISOString())
           .not('status', 'eq', 'cancelled');
-        
         const { data: monthOrders, error: monthError } = await supabase
           .from('orders')
           .select('final_total')
           .gte('created_at', monthStart.toISOString())
           .not('status', 'eq', 'cancelled');
-        
+
         // Get recent orders
         const { data: recent, error: recentError } = await supabase
           .from('orders')
@@ -93,7 +89,7 @@ export default function AdminDashboard() {
           `)
           .order('created_at', { ascending: false })
           .limit(5);
-          
+
         // Get restaurant settings
         const settings = await getRestaurantSettings();
         if (settings) {
@@ -104,7 +100,7 @@ export default function AdminDashboard() {
             email: settings.email || 'contact@genzcafe.com'
           });
         }
-        
+
         // Get popular items (mock data for now)
         setPopularItems([
           { id: 1, name: 'Butter Chicken', orders: 42, revenue: 8400 },
@@ -113,18 +109,18 @@ export default function AdminDashboard() {
           { id: 4, name: 'Chicken Biryani', orders: 30, revenue: 4800 },
           { id: 5, name: 'Masala Dosa', orders: 25, revenue: 3000 },
         ]);
-        
+
         // Check for errors
         if (ordersError || pendingError || menuError || categoriesError || 
             todayError || weekError || monthError || recentError) {
           throw new Error('Error fetching dashboard data');
         }
-        
+
         // Calculate revenue
         const revenueToday = todayOrders?.reduce((sum, order) => sum + order.final_total, 0) || 0;
         const revenueWeek = weekOrders?.reduce((sum, order) => sum + order.final_total, 0) || 0;
         const revenueMonth = monthOrders?.reduce((sum, order) => sum + order.final_total, 0) || 0;
-        
+
         setStats({
           totalOrders: totalOrders || 0,
           pendingOrders: pendingOrders || 0,
@@ -134,9 +130,9 @@ export default function AdminDashboard() {
           revenueWeek,
           revenueMonth
         });
-        
+
         setRecentOrders(recent || []);
-        
+
         setError(null);
       } catch (err: any) {
         console.error('Error fetching dashboard data:', err);
@@ -145,12 +141,61 @@ export default function AdminDashboard() {
         setIsLoading(false);
       }
     }
-    
     fetchDashboardData();
+
+    // Real-time subscription for new orders
+    const subscription = supabase
+      .channel('orders')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'orders'
+        },
+        (payload) => {
+          fetchDashboardData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+      if (alertTimeoutRef.current) clearTimeout(alertTimeoutRef.current);
+    };
   }, []);
+
+  // Detect new pending orders and play sound
+  useEffect(() => {
+    if (isLoading) return;
+    const currentPending = recentOrders.filter((o) => o.status === 'pending');
+    const currentIds = new Set(currentPending.map((o) => o.id));
+    const prevIds = prevOrderIdsRef.current;
+    let newOrderDetected = false;
+    for (const id of currentIds) {
+      if (!prevIds.has(id)) {
+        newOrderDetected = true;
+        break;
+      }
+    }
+    if (newOrderDetected && currentPending.length > 0) {
+      playNotificationSound();
+      setShowNewOrderAlert(true);
+      if (alertTimeoutRef.current) clearTimeout(alertTimeoutRef.current);
+      alertTimeoutRef.current = setTimeout(() => setShowNewOrderAlert(false), 2500);
+    }
+    prevOrderIdsRef.current = currentIds;
+  }, [recentOrders, isLoading]);
   
   return (
-    <div>
+    <div className="relative">
+      {/* Visual Alert for New Order */}
+      {showNewOrderAlert && (
+        <div className="fixed top-6 right-6 z-50 flex items-center gap-2 bg-yellow-200 text-yellow-900 px-4 py-2 rounded shadow-lg animate-bounce">
+          <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" /></svg>
+          <span className="font-semibold">New Order Received!</span>
+        </div>
+      )}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
         <p className="text-gray-600">Overview of your restaurant business</p>
