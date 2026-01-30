@@ -3,14 +3,33 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { getRestaurantSettings } from '@/lib/supabase/settings';
+import { getRestaurantSettings, isRestaurantOpen } from '@/lib/supabase/settings';
+import { useRouter } from 'next/navigation';
+
 
 export default function RestaurantClosedPage() {
+  const router = useRouter();
   const [restaurantInfo, setRestaurantInfo] = useState({
     name: 'GenZ Cafe',
     business_hours: '11:00 AM - 10:00 PM',
     phone: '+91 9876543210'
   });
+
+  // Poll for open status every 5 seconds
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    async function checkOpen() {
+      try {
+        const open = await isRestaurantOpen();
+        if (open) {
+          router.replace('/');
+        }
+      } catch (e) {}
+    }
+    checkOpen();
+    interval = setInterval(checkOpen, 5000);
+    return () => clearInterval(interval);
+  }, [router]);
 
   useEffect(() => {
     async function fetchInfo() {
@@ -27,7 +46,6 @@ export default function RestaurantClosedPage() {
         console.error('Error fetching restaurant info:', error);
       }
     }
-    
     fetchInfo();
   }, []);
 
