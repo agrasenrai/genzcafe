@@ -392,14 +392,15 @@ export default function OrdersPage() {
                       <span className="text-xs text-blue-700">
                         {order.scheduled_time ? new Date(order.scheduled_time).toLocaleString() : 'N/A'}
                       </span>
-                      {order.scheduled_time && (
+                      {order.scheduled_time && [5, 10, 20].map((min) => (
                         <button
+                          key={min}
                           className="ml-1 px-2 py-1 rounded bg-blue-100 text-blue-700 hover:bg-blue-200 text-xs font-bold"
-                          title="Add 10 minutes to pickup time"
+                          title={`Add ${min} minutes to pickup time`}
                           onClick={async (e) => {
                             e.stopPropagation();
                             const newTime = new Date(order.scheduled_time);
-                            newTime.setMinutes(newTime.getMinutes() + 10);
+                            newTime.setMinutes(newTime.getMinutes() + min);
                             const { error } = await supabase
                               .from('orders')
                               .update({ scheduled_time: newTime.toISOString() })
@@ -414,9 +415,9 @@ export default function OrdersPage() {
                             }
                           }}
                         >
-                          +
+                          +{min}m
                         </button>
-                      )}
+                      ))}
                     </div>
                   </td>
                 </tr>
@@ -458,28 +459,31 @@ export default function OrdersPage() {
                     <div className="flex items-center gap-2">
                       <span className="text-gray-600">Pickup Time:</span>{' '}
                       <span>{new Date(selectedOrder.scheduled_time).toLocaleString()}</span>
-                      <button
-                        className="ml-2 px-2 py-1 rounded bg-blue-100 text-blue-700 hover:bg-blue-200 text-xs font-bold"
-                        title="Add 10 minutes to pickup time"
-                        onClick={async () => {
-                          const newTime = new Date(selectedOrder.scheduled_time);
-                          newTime.setMinutes(newTime.getMinutes() + 10);
-                          // Update in DB
-                          const { error } = await supabase
-                            .from('orders')
-                            .update({ scheduled_time: newTime.toISOString() })
-                            .eq('id', selectedOrder.id);
-                          if (!error) {
-                            setSelectedOrder({ ...selectedOrder, scheduled_time: newTime.toISOString() });
-                            // Also update in orders list
-                            setOrders(orders => orders.map(o => o.id === selectedOrder.id ? { ...o, scheduled_time: newTime.toISOString() } : o));
-                          } else {
-                            alert('Failed to update pickup time');
-                          }
-                        }}
-                      >
-                        +
-                      </button>
+                      {[5, 10, 20].map((min) => (
+                        <button
+                          key={min}
+                          className="ml-1 px-2 py-1 rounded bg-blue-100 text-blue-700 hover:bg-blue-200 text-xs font-bold"
+                          title={`Add ${min} minutes to pickup time`}
+                          onClick={async () => {
+                            const newTime = new Date(selectedOrder.scheduled_time);
+                            newTime.setMinutes(newTime.getMinutes() + min);
+                            // Update in DB
+                            const { error } = await supabase
+                              .from('orders')
+                              .update({ scheduled_time: newTime.toISOString() })
+                              .eq('id', selectedOrder.id);
+                            if (!error) {
+                              setSelectedOrder({ ...selectedOrder, scheduled_time: newTime.toISOString() });
+                              // Also update in orders list
+                              setOrders(orders => orders.map(o => o.id === selectedOrder.id ? { ...o, scheduled_time: newTime.toISOString() } : o));
+                            } else {
+                              alert('Failed to update pickup time');
+                            }
+                          }}
+                        >
+                          +{min}m
+                        </button>
+                      ))}
                     </div>
                   )}
                 </div>
