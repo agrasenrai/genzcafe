@@ -354,9 +354,6 @@ export default function OrdersPage() {
                       <span className="text-sm font-medium text-gray-900">#{order.otp}</span>
                       <span className="text-sm text-gray-500">{formatDate(order.created_at)}</span>
                       <span className="text-sm text-gray-500">{formatPrice(order.final_total)}</span>
-                      {order.scheduled_time && (
-                        <span className="text-xs text-blue-700 mt-1">Pickup: {new Date(order.scheduled_time).toLocaleString()}</span>
-                      )}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -389,9 +386,21 @@ export default function OrdersPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-blue-700">
-                        {order.scheduled_time ? new Date(order.scheduled_time).toLocaleString() : 'N/A'}
-                      </span>
+                      {order.scheduled_time ? (() => {
+                        const scheduledDate = new Date(order.scheduled_time);
+                        const createdDate = new Date(order.created_at);
+                        const timeDiff = Math.abs(scheduledDate.getTime() - createdDate.getTime());
+                        const minutesDiff = timeDiff / (1000 * 60);
+                        const isASAP = minutesDiff <= 5; // Consider ASAP if within 5 minutes of order creation
+                        
+                        return (
+                          <span className={`text-xs font-medium ${isASAP ? 'text-purple-700' : 'text-yellow-700'}`}>
+                            {isASAP ? 'ASAP' : new Date(order.scheduled_time).toLocaleString()}
+                          </span>
+                        );
+                      })() : (
+                        <span className="text-xs text-gray-500">N/A</span>
+                      )}
                       {order.scheduled_time && [5, 10, 20].map((min) => (
                         <button
                           key={min}                       
