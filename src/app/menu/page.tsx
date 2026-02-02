@@ -20,6 +20,7 @@ interface MenuItem {
   protein: number | null;
   original_price: number | null;
   offer: string | null;
+  available: boolean;
   menu_categories: {
     name: string;
   };
@@ -285,10 +286,12 @@ export default function MenuPage() {
               {items.map((item) => (
                 <div
                   key={item.id}
-                  className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition-shadow"
+                  className={`rounded-2xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition-shadow ${!item.available ? 'opacity-60' : ''}`}
                   onClick={() => {
-                    setSelectedItem(item);
-                    setIsModalOpen(true);
+                    if (item.available) {
+                      setSelectedItem(item);
+                      setIsModalOpen(true);
+                    }
                   }}
                 >
                   <div className="flex gap-3">
@@ -300,7 +303,12 @@ export default function MenuPage() {
                         sizes="96px"
                         className="object-cover"
                       />
-                      {item.is_veg && (
+                      {!item.available && (
+                        <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">OUT OF STOCK</span>
+                        </div>
+                      )}
+                      {item.is_veg && item.available && (
                         <div className="absolute top-2 left-2 bg-white/90 backdrop-blur px-2 py-0.5 rounded-full text-[10px] font-semibold text-green-700 border border-green-100">
                           Veg
                         </div>
@@ -312,7 +320,7 @@ export default function MenuPage() {
                         <h3 className="font-semibold text-[15px] text-gray-900 leading-snug">
                           {item.name}
                         </h3>
-                        {item.rating && (
+                        {item.rating && item.available && (
                           <div className="flex items-center text-xs text-yellow-600 bg-yellow-50 border border-yellow-100 px-2 py-0.5 rounded-full">
                             <span className="font-semibold mr-1">★ {item.rating}</span>
                             {item.rating_count && (
@@ -329,7 +337,11 @@ export default function MenuPage() {
                           ₹{item.price.toFixed(2)}
                         </div>
                         
-                        {quantities[item.id] ? (
+                        {!item.available ? (
+                          <div className="px-4 py-1.5 text-xs font-semibold text-gray-400 bg-gray-100 rounded-full uppercase cursor-not-allowed">
+                            Out of Stock
+                          </div>
+                        ) : quantities[item.id] ? (
                           <div className="flex items-center">
                             <button 
                               className="w-8 h-8 flex items-center justify-center text-green-700 border border-green-600 rounded-full hover:bg-green-50"
@@ -451,7 +463,11 @@ export default function MenuPage() {
                 <p className="text-gray-700 text-base">{selectedItem.description}</p>
               </div>
               
-              {quantities[selectedItem.id] ? (
+              {!selectedItem.available ? (
+                <div className="mt-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg text-center">
+                  Out of Stock
+                </div>
+              ) : quantities[selectedItem.id] ? (
                 <div className="mt-6 flex items-center justify-center">
                   <div className="flex items-center border-2 border-black rounded-lg overflow-hidden">
                     <button 

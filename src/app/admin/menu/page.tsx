@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
-import { getAllMenuItems, getMenuCategories } from '@/lib/supabase/menu';
+import { getAllMenuItemsAdmin, getMenuCategories } from '@/lib/supabase/menu';
 import { formatPrice } from '@/lib/utils/helpers';
 
 interface MenuItem {
@@ -49,7 +49,7 @@ export default function MenuItemsPage() {
       try {
         setIsLoading(true);
         const [itemsData, categoriesData] = await Promise.all([
-          getAllMenuItems(),
+          getAllMenuItemsAdmin(),
           getMenuCategories()
         ]);
         
@@ -164,6 +164,32 @@ export default function MenuItemsPage() {
       setError('Failed to update items');
     } finally {
       setBulkActionLoading(false);
+    }
+  };
+  
+  // Handle individual item availability toggle
+  const handleIndividualAvailabilityToggle = async (id: string, currentAvailable: boolean) => {
+    try {
+      const { error: updateError } = await supabase
+        .from('menu_items')
+        .update({ 
+          available: !currentAvailable,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id);
+      
+      if (updateError) throw updateError;
+      
+      // Update local state
+      setMenuItems(menuItems.map(item => 
+        item.id === id 
+          ? { ...item, available: !currentAvailable } 
+          : item
+      ));
+      
+    } catch (err: any) {
+      console.error('Error updating item:', err);
+      setError('Failed to update item');
     }
   };
   
@@ -473,12 +499,24 @@ export default function MenuItemsPage() {
                   >
                     Edit
                   </Link>
-                  <button
-                    onClick={() => handleDeleteItem(item.id)}
-                    className="text-red-600 hover:text-red-900 text-sm"
-                  >
-                    Delete
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleIndividualAvailabilityToggle(item.id, item.available)}
+                      className={`text-xs px-2 py-1 rounded font-medium ${
+                        item.available 
+                          ? 'text-orange-600 hover:text-orange-900' 
+                          : 'text-green-600 hover:text-green-900'
+                      }`}
+                    >
+                      {item.available ? 'Mark Out' : 'Mark In'}
+                    </button>
+                    <button
+                      onClick={() => handleDeleteItem(item.id)}
+                      className="text-red-600 hover:text-red-900 text-sm"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -585,6 +623,16 @@ export default function MenuItemsPage() {
                     >
                       Edit
                     </Link>
+                    <button
+                      onClick={() => handleIndividualAvailabilityToggle(item.id, item.available)}
+                      className={`mr-4 text-xs font-medium ${
+                        item.available 
+                          ? 'text-orange-600 hover:text-orange-900' 
+                          : 'text-green-600 hover:text-green-900'
+                      }`}
+                    >
+                      {item.available ? 'Mark Out' : 'Mark In'}
+                    </button>
                     <button
                       onClick={() => handleDeleteItem(item.id)}
                       className="text-red-600 hover:text-red-900"

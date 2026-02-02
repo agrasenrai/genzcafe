@@ -28,7 +28,7 @@ export async function getMenuItemsByCategory(categoryId: string) {
 }
 
 /**
- * Get all menu items
+ * Get all menu items (for users - only available items)
  */
 export async function getAllMenuItems() {
   const { data, error } = await supabase
@@ -37,8 +37,7 @@ export async function getAllMenuItems() {
       *,
       menu_categories(name),
       item_feedback(rating)
-    `)
-    .eq('available', true);
+    `);
   
   if (error) throw error;
 
@@ -57,6 +56,21 @@ export async function getAllMenuItems() {
   });
 
   return itemsWithRating;
+}
+
+/**
+ * Get all menu items for admin (including unavailable items)
+ */
+export async function getAllMenuItemsAdmin() {
+  const { data, error } = await supabase
+    .from('menu_items')
+    .select(`
+      *,
+      menu_categories(name)
+    `);
+  
+  if (error) throw error;
+  return data;
 }
 
 /**
