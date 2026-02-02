@@ -14,7 +14,39 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [scheduledTime, setScheduledTime] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'cash'>('card');
+  
+  // Get current time and max time (6 hours from now) for time picker - dynamic calculation
+  const getCurrentTime = () => {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
+  
+  const getMaxTime = () => {
+    const now = new Date();
+    now.setHours(now.getHours() + 6);
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
+  
+  // Validate if selected time is within 6 hours from now
+  const isTimeValid = (timeString: string) => {
+    if (!timeString) return true;
+    
+    const [hours, minutes] = timeString.split(':').map(Number);
+    const selectedTime = new Date();
+    selectedTime.setHours(hours, minutes, 0, 0);
+    
+    const now = new Date();
+    const maxAllowedTime = new Date();
+    maxAllowedTime.setHours(maxAllowedTime.getHours() + 6);
+    
+    return selectedTime >= now && selectedTime <= maxAllowedTime;
+  };
   const [orderError, setOrderError] = useState<string | null>(null);
+  const [timeError, setTimeError] = useState<string | null>(null);
   const [totals, setTotals] = useState({
     itemTotal: 0,
     gst: 0,
@@ -97,15 +129,17 @@ export default function CheckoutPage() {
   const formatScheduledTime = () => {
     if (!scheduledTime || scheduledTime === '') return new Date().toISOString();
     
-    // For relative times (30, 60, 90, 120 minutes)
-    const minutes = parseInt(scheduledTime, 10);
-    if (!isNaN(minutes)) {
-      const date = new Date();
-      date.setMinutes(date.getMinutes() + minutes);
-      return date.toISOString();
+    // Parse the time input (HH:MM format)
+    const [hours, minutes] = scheduledTime.split(':').map(Number);
+    const scheduledDate = new Date();
+    scheduledDate.setHours(hours, minutes, 0, 0);
+    
+    // If the scheduled time is before current time, assume it's for tomorrow
+    if (scheduledDate < new Date()) {
+      scheduledDate.setDate(scheduledDate.getDate() + 1);
     }
     
-    return new Date().toISOString();
+    return scheduledDate.toISOString();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -352,21 +386,80 @@ export default function CheckoutPage() {
 
           {/* Scheduled Time */}
           <div className="bg-white rounded-lg p-4 shadow-sm">
-            <label htmlFor="time" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="time" className="block text-sm font-medium text-gray-700 mb-2">
               Pickup Time
             </label>
-            <select
-              id="time"
-              value={scheduledTime}
-              onChange={(e) => setScheduledTime(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-black focus:border-black"
-            >
-              <option value="">ASAP</option>
-              <option value="30">In 30 minutes</option>
-              <option value="60">In 1 hour</option>
-              <option value="90">In 1.5 hours</option>
-              <option value="120">In 2 hours</option>
-            </select>
+            <div className="space-y-3">
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setScheduledTime('');
+                    setTimeError(null);
+                  }}
+                  className={`flex-1 py-2 px-4 rounded-lg border-2 transition-colors ${
+                    scheduledTime === ''
+                      ? 'border-black bg-black text-white'
+                      : 'border-gray-200 text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  ASAP
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (scheduledTime === '') {
+                      const now = new Date();
+                      now.setMinutes(now.getMinutes() + 30);
+                      const hours = String(now.getHours()).padStart(2, '0');
+                      const minutes = String(now.getMinutes()).padStart(2, '0');
+                      setScheduledTime(`${hours}:${minutes}`);
+                    }
+                  }}
+                  className={`flex-1 py-2 px-4 rounded-lg border-2 transition-colors ${
+                    scheduledTime !== ''
+                      ? 'border-black bg-black text-white'
+                      : 'border-gray-200 text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  Schedule
+                </button>
+              </div>
+              
+              {scheduledTime !== '' && (
+                <div className="relative">
+                  <input
+                    type="time"
+                    id="time"
+                    value={scheduledTime}
+                    onChange={(e) => {
+                      const newTime = e.target.value;
+                      if (isTimeValid(newTime)) {
+                        setScheduledTime(newTime);
+                        setTimeError(null);
+                      } else {
+                        setTimeError(`Time not applicable. Please select a time between ${getCurrentTime()} and ${getMaxTime()} (within 6 hours from now)`);
+                      }
+                    }}
+                    min={getCurrentTime()}
+                    max={getMaxTime()}
+                    className={`w-full px-4 py-2 rounded-lg border focus:ring-2 focus:border-black text-lg ${
+                      timeError ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-black'
+                    }`}
+                    required={scheduledTime !== ''}
+                  />
+                  {timeError ? (
+                    <p className="mt-1 text-xs text-red-600">
+                      {timeError}
+                    </p>
+                  ) : (
+                    <p className="mt-1 text-xs text-gray-500">
+                      Select a time within the next 6 hours (until {getMaxTime()})
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Payment Method */}
