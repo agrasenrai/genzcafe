@@ -372,7 +372,8 @@ export default function SettingsPage() {
       
     } catch (err: any) {
       console.error('Error saving settings:', err);
-      setError('Failed to save settings');
+      const message = err?.message || 'Failed to save settings';
+      setError(message);
     } finally {
       setIsSaving(false);
     }
