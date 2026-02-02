@@ -15,7 +15,7 @@ export interface OrderItem {
 export interface OrderData {
   user_id: string | null;
   order_type: 'pickup';  // Only pickup is available
-  delivery_address: null;  // No delivery address needed
+  delivery_address: string | null;  // Pickup point address
   scheduled_time: string;
   payment_method: 'card' | 'cash';
   item_total: number;
@@ -51,7 +51,7 @@ export async function createOrder(orderData: OrderData) {
       .insert({
         user_id: orderData.user_id,
         order_type: orderData.order_type,
-        delivery_address: null,  // Always null since we only support pickup
+        delivery_address: orderData.delivery_address,  // Store selected pickup point
         scheduled_time: orderData.scheduled_time,
         payment_method: orderData.payment_method,
         item_total: orderData.item_total,

@@ -57,6 +57,8 @@ export default function SettingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'general' | 'payment' | 'delivery' | 'appearance' | 'social'>('general');
+  const [deliveryPoints, setDeliveryPoints] = useState<Array<{name: string; address: string; phone?: string}>>([]);
+  const [newPoint, setNewPoint] = useState({ name: '', address: '', phone: '' });
   const [weeklySchedule, setWeeklySchedule] = useState<WeeklySchedule>({
     monday: { isOpen: true, openTime: '09:00', closeTime: '22:00' },
     tuesday: { isOpen: true, openTime: '09:00', closeTime: '22:00' },
@@ -242,6 +244,20 @@ export default function SettingsPage() {
     
     fetchSettings();
   }, []);
+
+  // Parse and load delivery points when settings change
+  useEffect(() => {
+    if (settings?.delivery_points) {
+      try {
+        setDeliveryPoints(JSON.parse(settings.delivery_points));
+      } catch (err) {
+        console.error('Error parsing delivery points:', err);
+        setDeliveryPoints([]);
+      }
+    } else {
+      setDeliveryPoints([]);
+    }
+  }, [settings?.delivery_points]);
   
   // Handle weekly schedule changes
   const handleDayToggle = (day: keyof WeeklySchedule) => {
@@ -898,6 +914,84 @@ export default function SettingsPage() {
                     step="0.01"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
                   />
+                </div>
+              </div>
+
+              {/* Delivery Points Management */}
+              <div className="border-t pt-6">
+                <h3 className="text-lg font-semibold mb-3">Pickup Locations</h3>
+                <div className="space-y-3 mb-4">
+                  {deliveryPoints.map((point, idx) => (
+                    <div key={idx} className="bg-gray-50 p-3 rounded-lg border border-gray-200 flex justify-between items-start">
+                      <div>
+                        <p className="font-medium text-gray-900">{point.name}</p>
+                        <p className="text-sm text-gray-600">{point.address}</p>
+                        {point.phone && <p className="text-sm text-gray-600">{point.phone}</p>}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = deliveryPoints.filter((_, i) => i !== idx);
+                          setDeliveryPoints(updated);
+                          if (settings) {
+                            setSettings({
+                              ...settings,
+                              delivery_points: JSON.stringify(updated)
+                            });
+                          }
+                        }}
+                        className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                  <h4 className="font-medium text-gray-900 mb-3">Add New Pickup Location</h4>
+                  <div className="space-y-3">
+                    <input
+                      type="text"
+                      placeholder="Location name (e.g., Main Store, Downtown)"
+                      value={newPoint.name}
+                      onChange={(e) => setNewPoint({...newPoint, name: e.target.value})}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Address"
+                      value={newPoint.address}
+                      onChange={(e) => setNewPoint({...newPoint, address: e.target.value})}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                    />
+                    <input
+                      type="tel"
+                      placeholder="Phone (optional)"
+                      value={newPoint.phone}
+                      onChange={(e) => setNewPoint({...newPoint, phone: e.target.value})}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (newPoint.name && newPoint.address) {
+                          const updated = [...deliveryPoints, newPoint];
+                          setDeliveryPoints(updated);
+                          if (settings) {
+                            setSettings({
+                              ...settings,
+                              delivery_points: JSON.stringify(updated)
+                            });
+                          }
+                          setNewPoint({ name: '', address: '', phone: '' });
+                        }
+                      }}
+                      className="w-full px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 font-medium"
+                    >
+                      Add Location
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

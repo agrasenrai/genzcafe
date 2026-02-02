@@ -55,6 +55,7 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [locationFilter, setLocationFilter] = useState<'all' | 'takeaway' | 'delivery'>('all');
   const [sortBy, setSortBy] = useState('newest');
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<OrderWithFeedback | null>(null);
@@ -179,11 +180,25 @@ export default function OrdersPage() {
 
   // Filter orders by status
   const filteredOrders = orders.filter(order => {
-    if (statusFilter === 'all') return true;
-    if (statusFilter === 'active') {
-      return ['pending', 'confirmed', 'preparing', 'ready'].includes(order.status);
+    // Status filter
+    if (statusFilter === 'all') {
+      // continue
+    } else if (statusFilter === 'active') {
+      if (!['pending', 'confirmed', 'preparing', 'ready'].includes(order.status)) {
+        return false;
+      }
+    } else if (order.status !== statusFilter) {
+      return false;
     }
-    return order.status === statusFilter;
+
+    // Location filter
+    if (locationFilter === 'takeaway') {
+      return order.delivery_address && order.delivery_address.toLowerCase().includes('take');
+    } else if (locationFilter === 'delivery') {
+      return order.delivery_address && !order.delivery_address.toLowerCase().includes('take');
+    }
+
+    return true;
   });
 
   // Handle status update
@@ -268,6 +283,65 @@ export default function OrdersPage() {
         <p className="text-gray-600">Manage your restaurant orders</p>
       </div>
 
+      {/* Counter Management Section */}
+      <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
+        <h2 className="text-sm font-medium text-gray-700 mb-3">Counter Management</h2>
+        <div className="flex gap-3">
+          <button
+            onClick={() => setLocationFilter('all')}
+            className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
+              locationFilter === 'all'
+                ? 'bg-black text-white shadow-md'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            <div className="flex flex-col items-center">
+              <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+              <span>All Orders</span>
+              <span className="text-xs mt-1 opacity-80">{orders.length} orders</span>
+            </div>
+          </button>
+          <button
+            onClick={() => setLocationFilter('takeaway')}
+            className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
+              locationFilter === 'takeaway'
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            <div className="flex flex-col items-center">
+              <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              <span>Takeaway</span>
+              <span className="text-xs mt-1 opacity-80">
+                {orders.filter(o => o.delivery_address && o.delivery_address.toLowerCase().includes('take')).length} orders
+              </span>
+            </div>
+          </button>
+          <button
+            onClick={() => setLocationFilter('delivery')}
+            className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
+              locationFilter === 'delivery'
+                ? 'bg-green-600 text-white shadow-md'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            <div className="flex flex-col items-center">
+              <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+              </svg>
+              <span>Delivery</span>
+              <span className="text-xs mt-1 opacity-80">
+                {orders.filter(o => o.delivery_address && !o.delivery_address.toLowerCase().includes('take')).length} orders
+              </span>
+            </div>
+          </button>
+        </div>
+      </div>
+
       {/* Filters */}
       <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -332,6 +406,9 @@ export default function OrdersPage() {
                   Customer
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Delivery Point
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -359,6 +436,11 @@ export default function OrdersPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{order.customer_name}</div>
                     <div className="text-sm text-gray-500">{order.customer_phone}</div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="text-sm text-gray-900">
+                      {order.delivery_address || <span className="text-gray-400">Not specified</span>}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-2">
@@ -465,6 +547,9 @@ export default function OrdersPage() {
                   <p className="mt-1">Date: {formatDate(selectedOrder.created_at)}</p>
                   <p>Time: {formatTime(selectedOrder.created_at)}</p>
                   <p>Type: {selectedOrder.order_type === 'pickup' ? 'Pickup' : 'Delivery'}</p>
+                  {selectedOrder.delivery_address && (
+                    <p className="font-medium text-gray-900">Pickup Point: {selectedOrder.delivery_address}</p>
+                  )}
                   {selectedOrder.scheduled_time && (
                     <div className="flex items-center gap-2">
                       <span className="text-gray-600">Pickup Time:</span>{' '}

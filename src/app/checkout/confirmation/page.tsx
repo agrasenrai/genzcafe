@@ -19,7 +19,7 @@ interface OrderDetails {
   discountAmount: number;
   finalTotal: number;
   orderType: 'pickup';
-  deliveryAddress: null;
+  deliveryAddress: string | null;
   scheduledTime: string;
   paymentMethod: 'card' | 'cash';
   paymentId?: string;
@@ -151,7 +151,15 @@ export default function CheckoutConfirmation() {
                 </p>
                 <p>
                   <span className="text-gray-600">Order Type:</span>{' '}
-                  Pickup
+                  {order.deliveryAddress ? (
+                    order.deliveryAddress.toLowerCase().includes('take') ? (
+                      <span>Takeaway - <span className="font-medium">{order.deliveryAddress}</span></span>
+                    ) : (
+                      <span>Delivery - <span className="font-medium">{order.deliveryAddress}</span></span>
+                    )
+                  ) : (
+                    'Pickup'
+                  )}
                 </p>
               </div>
             </>
@@ -172,6 +180,12 @@ export default function CheckoutConfirmation() {
                   <span className="text-gray-600">Pickup OTP</span>
                   <span className="font-medium text-lg">{order.otp}</span>
                 </div>
+                {order.deliveryAddress && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Location</span>
+                    <span className="font-medium">{order.deliveryAddress}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-gray-600">Pickup Time</span>
                   <span>{order.scheduledTime === 'ASAP' ? 'As soon as possible' : order.scheduledTime}</span>

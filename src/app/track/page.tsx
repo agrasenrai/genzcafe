@@ -28,7 +28,7 @@ interface OrderDetails {
   discountAmount: number;
   finalTotal: number;
   orderType: 'pickup';
-  deliveryAddress: null;
+  deliveryAddress: string | null;
   scheduledTime: string;
   paymentMethod: 'card' | 'cash';
   otp: string;
@@ -354,7 +354,15 @@ function TrackOrderContent() {
                   </p>
                   <p>
                     <span className="text-gray-600">Order Type:</span>{' '}
-                    Pickup
+                    {order.deliveryAddress ? (
+                      order.deliveryAddress.toLowerCase().includes('take') ? (
+                        <span>Takeaway - <span className="font-medium">{order.deliveryAddress}</span></span>
+                      ) : (
+                        <span>Delivery - <span className="font-medium">{order.deliveryAddress}</span></span>
+                      )
+                    ) : (
+                      'Pickup'
+                    )}
                   </p>
                   <p>
                     <span className="text-gray-600">Customer:</span>{' '}

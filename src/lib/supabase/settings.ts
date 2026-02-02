@@ -24,6 +24,7 @@ export interface RestaurantSettings {
   offer_takeout: boolean;
   offer_delivery: boolean;
   delivery_radius_km: number | null;
+  delivery_points: string | null;  // JSON array of delivery points
   currency: string;
   instagram_handle: string | null;
   facebook_handle: string | null;
@@ -246,4 +247,18 @@ export async function getRestaurantInfo() {
     openingHours: settings?.business_hours || '11:00 AM - 10:00 PM',
     description: settings?.description || 'Modern cafe ordering platform for the new generation'
   };
+}
+
+/**
+ * Get delivery points from restaurant settings
+ */
+export function getDeliveryPointsFromSettings(settings: RestaurantSettings | null): Array<{name: string; address: string; phone?: string}> {
+  if (!settings?.delivery_points) return [];
+  
+  try {
+    return JSON.parse(settings.delivery_points);
+  } catch (error) {
+    console.error('Error parsing delivery points:', error);
+    return [];
+  }
 }

@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { useCart } from '@/lib/context/CartContext';
 import { createOrder, updateOrderPayment } from '@/lib/supabase/orders';
 import { initializeRazorpayPayment } from '@/lib/utils/razorpay';
-import { getPlatformFees, getRestaurantSettings, isRestaurantOpen } from '@/lib/supabase/settings';
+import { getPlatformFees, getRestaurantSettings, isRestaurantOpen, getDeliveryPointsFromSettings } from '@/lib/supabase/settings';
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -65,6 +65,10 @@ export default function CheckoutPage() {
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
+  
+  // Delivery points state
+  const [deliveryPoints, setDeliveryPoints] = useState<Array<{name: string; address: string; phone?: string}>>([]);
+  const [selectedDeliveryPoint, setSelectedDeliveryPoint] = useState<string>('');
 
   // Calculate totals, tax rate, and payment settings whenever items change
   useEffect(() => {
@@ -83,6 +87,13 @@ export default function CheckoutPage() {
           accept_credit_cards: restaurantSettings.accept_credit_cards ?? true,
           accept_cash: restaurantSettings.accept_cash ?? true
         });
+        
+        // Load delivery points
+        const points = getDeliveryPointsFromSettings(restaurantSettings);
+        setDeliveryPoints(points);
+        if (points.length > 0) {
+          setSelectedDeliveryPoint(points[0].name);
+        }
       }
     };
     loadSettingsAndTotals();
@@ -172,7 +183,7 @@ export default function CheckoutPage() {
       const orderData = {
         user_id: null, // No user ID for guest checkout
         order_type: 'pickup' as const, // Explicitly type as 'pickup'
-        delivery_address: null,
+        delivery_address: selectedDeliveryPoint || null, // Selected pickup location
         scheduled_time: formattedScheduledTime,
         payment_method: paymentMethod,
         item_total: totals.itemTotal,
@@ -189,6 +200,9 @@ export default function CheckoutPage() {
         customer_email: customerEmail || null
       };
 
+      console.log('Order data being sent:', orderData); // Debug log
+      console.log('Selected delivery point:', selectedDeliveryPoint); // Debug log
+
       // Submit order to Supabase
       const { orderId, otp } = await createOrder(orderData);
       
@@ -203,7 +217,7 @@ export default function CheckoutPage() {
         discountAmount: totals.discountAmount,
         finalTotal: finalAmount,
         orderType: 'pickup',
-        deliveryAddress: null,
+        deliveryAddress: selectedDeliveryPoint || null,
         scheduledTime: scheduledTime || 'ASAP',
         paymentMethod,
         otp,
@@ -377,11 +391,37 @@ export default function CheckoutPage() {
 
           {/* Pickup Information Section */}
           <div className="bg-white rounded-lg p-4 shadow-sm">
-            <h2 className="font-semibold mb-3">Pickup Information</h2>
-            <p className="text-sm text-gray-600 mb-3">
-              Your order will be available for pickup at our restaurant.
-              {/* Add restaurant address here if available */}
-            </p>
+            <h2 className="font-semibold mb-3">Select Pickup Location</h2>
+            {deliveryPoints.length > 0 ? (
+              <div className="space-y-2">
+                {deliveryPoints.map((point) => (
+                  <label key={point.name} className="flex items-start p-3 border-2 rounded-lg cursor-pointer transition-colors"
+                    style={{
+                      borderColor: selectedDeliveryPoint === point.name ? '#000' : '#e5e7eb',
+                      backgroundColor: selectedDeliveryPoint === point.name ? '#f9fafb' : '#fff'
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="delivery_location"
+                      value={point.name}
+                      checked={selectedDeliveryPoint === point.name}
+                      onChange={(e) => setSelectedDeliveryPoint(e.target.value)}
+                      className="mt-1 mr-3"
+                    />
+                    <div>
+                      <p className="font-medium text-gray-900">{point.name}</p>
+                      <p className="text-sm text-gray-600">{point.address}</p>
+                      {point.phone && <p className="text-sm text-gray-600">📞 {point.phone}</p>}
+                    </div>
+                  </label>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-600">
+                Your order will be available for pickup at our restaurant.
+              </p>
+            )}
           </div>
 
           {/* Scheduled Time */}
