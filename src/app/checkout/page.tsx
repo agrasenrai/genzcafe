@@ -386,8 +386,8 @@ export default function CheckoutPage() {
                   Card
                 </button>
               )}
-              {/* Remove cash option for ASAP pickup */}
-              {paymentSettings.accept_cash && !isASAPPickup && (
+              {/* Pay on Counter option only for ASAP pickup */}
+              {paymentSettings.accept_cash && isASAPPickup && (
                 <button
                   type="button"
                   onClick={() => setPaymentMethod('cash')}
@@ -397,7 +397,7 @@ export default function CheckoutPage() {
                       : 'border-gray-200 text-gray-700'
                   }`}
                 >
-                  Cash
+                  Pay on Counter
                 </button>
               )}
             </div>
@@ -414,15 +414,21 @@ export default function CheckoutPage() {
               </p>
             )}
             
+            {paymentMethod === 'cash' && isASAPPickup && (
+              <p className="mt-2 text-sm text-gray-600">
+                Pay on counter when you pickup your order at our restaurant.
+              </p>
+            )}
+            
             {!isASAPPickup && paymentSettings.accept_cash && (
               <p className="mt-2 text-sm text-gray-600">
-                Cash payment is only available for ASAP pickup orders.
+                Pay on Counter is only available for ASAP pickup orders. Please select a card payment or choose ASAP pickup.
               </p>
             )}
             
             {!paymentSettings.accept_credit_cards && paymentSettings.accept_cash && (
               <p className="mt-2 text-sm text-gray-600">
-                Only cash payments are accepted for pickup orders.
+                Only Pay on Counter is accepted for ASAP pickup.
               </p>
             )}
             
