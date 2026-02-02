@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useCart } from '@/lib/context/CartContext';
 import { useState, useEffect, useRef } from 'react';
 import { getAllMenuItems } from '@/lib/supabase/menu';
-
+//redploy
 interface MenuItem {
   id: string;
   name: string;
