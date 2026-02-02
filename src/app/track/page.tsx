@@ -196,7 +196,7 @@ function TrackOrderContent() {
   const canLeaveFeedback = order?.status === 'delivered';
 
   return (
-    <div className="max-w-md mx-auto min-h-screen bg-white shadow-sm">
+    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col">
       <Toaster position="top-center" />
       <header className="bg-white shadow-sm">
         <div className="max-w-md mx-auto px-4 py-4 flex items-center">
@@ -210,7 +210,7 @@ function TrackOrderContent() {
         </div>
       </header>
 
-      <main className="flex-1 p-4">
+      <main className="flex-1 overflow-y-auto p-4">
         <div className="max-w-md mx-auto">
           {!order ? (
             <>
@@ -456,7 +456,7 @@ function TrackOrderContent() {
 // Loading fallback
 function TrackOrderLoading() {
   return (
-    <div className="max-w-md mx-auto min-h-screen bg-white shadow-sm flex items-center justify-center">
+    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white flex items-center justify-center">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-800"></div>
     </div>
   );

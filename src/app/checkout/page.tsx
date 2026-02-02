@@ -260,7 +260,7 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto min-h-screen bg-white shadow-sm">
+    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col">
       <header className="bg-white shadow-sm">
         <div className="max-w-md mx-auto px-4 py-4 flex items-center">
           <Link href="/cart" className="text-gray-800">
@@ -273,7 +273,7 @@ export default function CheckoutPage() {
         </div>
       </header>
 
-      <main className="flex-1 p-4">
+      <main className="flex-1 overflow-y-auto p-4">
         {orderError && (
           <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg">
             {orderError}

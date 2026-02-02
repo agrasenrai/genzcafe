@@ -77,7 +77,7 @@ export default function CheckoutConfirmation() {
 
   if (!order) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center">
+      <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white flex flex-col items-center justify-center">
         <div className="text-center">
           <h1 className="text-xl font-semibold mb-4">Order Not Found</h1>
           <p className="mb-6">We couldn't find your order details.</p>
@@ -95,7 +95,7 @@ export default function CheckoutConfirmation() {
   const orderCancelled = order.status === 'cancelled';
 
   return (
-    <div className="max-w-md mx-auto min-h-screen bg-white shadow-sm flex flex-col">
+    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col">
       <header className="bg-white shadow-sm">
         <div className="max-w-md mx-auto px-4 py-4 flex items-center">
           <Link href="/menu" className="text-gray-800">
@@ -262,7 +262,7 @@ export default function CheckoutConfirmation() {
       
       {/* Fixed Track Order Button */}
       {!orderCancelled && (
-        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200 p-4">
+        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl bg-white border-t border-gray-200 p-4">
           <Link
             href={`/track?otp=${order.otp}`}
             className="block w-full bg-black text-white text-center py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors"

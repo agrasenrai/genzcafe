@@ -59,7 +59,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto min-h-screen bg-white shadow-sm">
+    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col">
       <header className="bg-white shadow-sm">
         <div className="max-w-md mx-auto px-4 py-4 flex items-center">
           <Link href="/" className="text-gray-800">
@@ -72,7 +72,7 @@ export default function SignupPage() {
         </div>
       </header>
 
-      <main className="flex-1 p-4">
+      <main className="flex-1 overflow-y-auto p-4">
         <form onSubmit={handleSubmit} className="space-y-6 max-w-sm mx-auto pt-8">
           {error && (
             <div className="bg-red-50 text-red-500 p-3 rounded-lg text-sm">

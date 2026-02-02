@@ -50,7 +50,7 @@ export default function RestaurantClosedPage() {
   }, []);
 
   return (
-    <div className="fixed inset-0 w-full max-w-md mx-auto bg-white shadow-sm overflow-hidden">
+    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden">
       {/* Background with subtle pattern */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100">
         <div className="absolute inset-0 opacity-5">

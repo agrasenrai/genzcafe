@@ -4,7 +4,7 @@ export default function PublicLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="max-w-md mx-auto min-h-screen bg-white shadow-sm">
+    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden">
       {children}
     </div>
   );

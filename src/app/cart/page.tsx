@@ -107,7 +107,7 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="h-[100dvh] flex flex-col">
+      <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col">
         <header className="bg-white shadow-sm">
           <div className="max-w-md mx-auto px-4 py-4 flex items-center">
             <Link href="/menu" className="text-gray-800">
@@ -136,7 +136,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto h-[100dvh] bg-white shadow-sm flex flex-col">
+    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col">
       <header className="bg-white shadow-sm">
         <div className="max-w-md mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center">

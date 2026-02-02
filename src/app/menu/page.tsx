@@ -37,6 +37,7 @@ export default function MenuPage() {
   const [error, setError] = useState<string | null>(null);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   
   // Create refs for category sections
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -140,84 +141,94 @@ export default function MenuPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto min-h-screen bg-white">
+    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col">
       {/* Header */}
       <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="text-gray-800">
+        <div className="px-4 py-4 flex items-center justify-between gap-3 relative">
+          <Link href="/" className="text-gray-800 flex-shrink-0">
             <span className="sr-only">Back to Home</span>
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </Link>
-          <h1 className="text-xl font-bold">Menu</h1>
-          <div className="w-6"></div> {/* Spacer for centering */}
+          {!isSearchOpen ? (
+            <h1 className="text-xl font-bold text-center absolute left-1/2 -translate-x-1/2">Menu</h1>
+          ) : (
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                placeholder="Search dishes..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                autoFocus
+                className="w-full py-2 pl-9 pr-3 border border-gray-200 rounded-full text-sm bg-gray-50 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+              />
+              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+            </div>
+          )}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Pure Veg toggle - green veg icon (Indian veg symbol: circle with dot) */}
+            <button
+              onClick={() => setIsVegOnly(!isVegOnly)}
+              className={`p-2 rounded-full transition-colors ${isVegOnly ? 'bg-green-100' : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600'}`}
+              title={isVegOnly ? 'Pure Veg Only (click to show all)' : 'Show Pure Veg only'}
+              aria-label={isVegOnly ? 'Pure Veg filter active' : 'Pure Veg filter'}
+            >
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isVegOnly ? 'border-green-600 bg-green-50' : 'border-gray-300'}`}>
+                <div className={`w-2 h-2 rounded-full ${isVegOnly ? 'bg-green-600' : 'bg-gray-300'}`} />
+              </div>
+            </button>
+            {/* Search icon / Close icon when search open */}
+            <button
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              className={`p-2 rounded-full transition-colors ${isSearchOpen ? 'bg-gray-100 text-gray-800' : 'text-gray-600 hover:bg-gray-100'}`}
+              title={isSearchOpen ? 'Close search' : 'Search'}
+              aria-label={isSearchOpen ? 'Close search' : 'Search'}
+            >
+              {isSearchOpen ? (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              )}
+            </button>
+          </div>
         </div>
 
-        {/* Search and Filters */}
-        <div className="px-4 py-2 border-b border-gray-100">
-          <div className="relative mb-3">
-            <input
-              type="text"
-              placeholder="Search dishes..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full py-2 pl-10 pr-3 border border-gray-200 rounded-full text-sm bg-gray-50"
-            />
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-          </div>
-          
-          <div className="flex flex-col space-y-3">
-            <div className="inline-flex items-center w-auto bg-gray-50 px-4 py-2 rounded-full cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isVegOnly}
-                onChange={() => setIsVegOnly(!isVegOnly)}
-                className="sr-only"
-                id="veg-toggle"
-              />
-              <label 
-                htmlFor="veg-toggle"
-                className="flex items-center cursor-pointer"
-              >
-                <div className={`w-5 h-5 border rounded-full mr-2 flex items-center justify-center ${isVegOnly ? 'border-gray-400' : 'border-gray-300'}`}>
-                  <div className={`w-3 h-3 rounded-full ${isVegOnly ? 'bg-gray-400' : 'bg-transparent'}`}></div>
-                </div>
-                <span className="text-sm text-gray-700">Pure Veg Only</span>
-              </label>
-            </div>
-
-            {/* Categories */}
-            <div className="flex overflow-x-auto py-1 scrollbar-hide">
+        {/* Categories - only when search is closed, or always show */}
+        <div className="px-4 pb-3 border-b border-gray-100">
+          <div className="flex overflow-x-auto py-1 scrollbar-hide gap-2">
+            <button
+              className={`px-3 py-1.5 text-sm whitespace-nowrap rounded-full flex-shrink-0 ${
+                selectedCategory === null ? 'bg-black text-white' : 'bg-gray-100 text-gray-800'
+              }`}
+              onClick={() => setSelectedCategory(null)}
+            >
+              All
+            </button>
+            {categories.map((category) => (
               <button
-                className={`px-3 py-1 text-sm whitespace-nowrap mr-2 rounded-full ${
-                  selectedCategory === null ? 'bg-black text-white' : 'bg-gray-100 text-gray-800'
+                key={category}
+                className={`px-3 py-1.5 text-sm whitespace-nowrap rounded-full flex-shrink-0 ${
+                  selectedCategory === category ? 'bg-black text-white' : 'bg-gray-100 text-gray-800'
                 }`}
-                onClick={() => setSelectedCategory(null)}
+                onClick={() => setSelectedCategory(category)}
               >
-                All
+                {category}
               </button>
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  className={`px-3 py-1 text-sm whitespace-nowrap mr-2 rounded-full ${
-                    selectedCategory === category ? 'bg-black text-white' : 'bg-gray-100 text-gray-800'
-                  }`}
-                  onClick={() => setSelectedCategory(category)}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
       </header>
 
-      <main className="pb-24">
+      <main className="flex-1 overflow-x-hidden overflow-y-auto pb-24">
         {/* Loading state */}
         {isLoading && (
           <div className="flex justify-center items-center h-40">
@@ -250,6 +261,7 @@ export default function MenuPage() {
                   setSearchTerm('');
                   setSelectedCategory(null);
                   setIsVegOnly(false);
+                  setIsSearchOpen(false);
                 }}
               >
                 Reset filters
@@ -265,19 +277,22 @@ export default function MenuPage() {
             className="mt-4"
             ref={el => { categoryRefs.current[category] = el; }}
           >
-            <h2 className="text-2xl font-bold px-4 mb-3">{category}</h2>
-            <div className="divide-y divide-gray-100">
+            <div className="px-4 mb-2 flex items-center justify-between">
+              <h2 className="text-2xl font-bold">{category}</h2>
+              <span className="text-xs text-gray-400">{items.length} items</span>
+            </div>
+            <div className="px-4 space-y-4">
               {items.map((item) => (
                 <div
                   key={item.id}
-                  className="px-4 py-4"
+                  className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition-shadow"
                   onClick={() => {
                     setSelectedItem(item);
                     setIsModalOpen(true);
                   }}
                 >
-                  <div className="flex">
-                    <div className="w-24 h-24 relative rounded-md overflow-hidden mr-3 flex-shrink-0">
+                  <div className="flex gap-3">
+                    <div className="w-24 h-24 relative rounded-xl overflow-hidden flex-shrink-0">
                       <Image
                         src={item.image_url || '/placeholder-food.jpg'}
                         alt={item.name}
@@ -286,34 +301,38 @@ export default function MenuPage() {
                         className="object-cover"
                       />
                       {item.is_veg && (
-                        <div className="absolute top-1 left-1 bg-white p-0.5 rounded-sm">
-                          <div className="w-4 h-4 border border-green-600 flex items-center justify-center">
-                            <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                          </div>
+                        <div className="absolute top-2 left-2 bg-white/90 backdrop-blur px-2 py-0.5 rounded-full text-[10px] font-semibold text-green-700 border border-green-100">
+                          Veg
                         </div>
                       )}
                     </div>
                     
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <h3 className="font-medium text-lg text-gray-900">{item.name}</h3>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start gap-2">
+                        <h3 className="font-semibold text-[15px] text-gray-900 leading-snug">
+                          {item.name}
+                        </h3>
                         {item.rating && (
-                          <div className="flex items-center text-sm text-yellow-500">
-                            <span className="font-medium mr-1">★ {item.rating}</span>
+                          <div className="flex items-center text-xs text-yellow-600 bg-yellow-50 border border-yellow-100 px-2 py-0.5 rounded-full">
+                            <span className="font-semibold mr-1">★ {item.rating}</span>
                             {item.rating_count && (
-                              <span className="text-gray-500 text-xs">({item.rating_count})</span>
+                              <span className="text-gray-500">({item.rating_count})</span>
                             )}
                           </div>
                         )}
                       </div>
-                      <p className="mt-1 text-sm text-gray-500 line-clamp-2">{item.description}</p>
-                      <div className="mt-auto flex items-center justify-between">
-                        <div className="font-medium">₹{item.price.toFixed(2)}</div>
+                      <p className="mt-1 text-sm text-gray-500 line-clamp-2">
+                        {item.description}
+                      </p>
+                      <div className="mt-3 flex items-center justify-between">
+                        <div className="text-base font-semibold text-gray-900">
+                          ₹{item.price.toFixed(2)}
+                        </div>
                         
                         {quantities[item.id] ? (
                           <div className="flex items-center">
                             <button 
-                              className="w-8 h-8 flex items-center justify-center text-green-600 border border-green-600 rounded-full"
+                              className="w-8 h-8 flex items-center justify-center text-green-700 border border-green-600 rounded-full hover:bg-green-50"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleQuantityChange(item.id, quantities[item.id] - 1);
@@ -323,7 +342,7 @@ export default function MenuPage() {
                             </button>
                             <span className="mx-3 min-w-[1.5rem] text-center">{quantities[item.id]}</span>
                             <button 
-                              className="w-8 h-8 flex items-center justify-center text-green-600 border border-green-600 rounded-full"
+                              className="w-8 h-8 flex items-center justify-center text-green-700 border border-green-600 rounded-full hover:bg-green-50"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleQuantityChange(item.id, quantities[item.id] + 1);
@@ -334,7 +353,7 @@ export default function MenuPage() {
                           </div>
                         ) : (
                           <button
-                            className="px-4 py-1 text-sm font-medium text-green-600 border border-green-600 rounded-full uppercase hover:bg-green-50"
+                            className="px-4 py-1.5 text-xs font-semibold text-green-700 border border-green-600 rounded-full uppercase hover:bg-green-50"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleAddToCart(item);
@@ -495,14 +514,23 @@ export default function MenuPage() {
 
         {/* Categories popup menu */}
         {isMenuOpen && (
-          <div className="absolute bottom-16 right-0 bg-white rounded-lg shadow-xl p-4 min-w-[180px] border border-gray-100">
-            <h3 className="text-sm font-semibold text-gray-800 mb-2">Jump to</h3>
-            <div className="flex flex-col gap-2">
+          <div className="absolute bottom-16 right-0 bg-white rounded-lg shadow-xl p-3 min-w-[190px] border border-gray-100">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Jump to</h3>
+              <button
+                onClick={() => setIsMenuOpen(false)}
+                className="text-xs text-gray-500 hover:text-gray-700"
+              >
+                Close
+              </button>
+            </div>
+            <div className="max-h-48 overflow-auto pr-1 space-y-1">
               {categories.map((category) => (
                 <button
                   key={category}
                   onClick={() => scrollToCategory(category)}
-                  className="text-left text-sm py-2 px-3 hover:bg-gray-100 rounded-md transition-colors"
+                  className="w-full text-left text-sm py-1.5 px-2 hover:bg-gray-100 rounded-md transition-colors truncate"
+                  title={category}
                 >
                   {category}
                 </button>
