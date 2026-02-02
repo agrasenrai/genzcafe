@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from '@/lib/context/CartContext';
 import { AuthProvider } from '@/lib/context/AuthContext';
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -43,6 +44,7 @@ export default function RootLayout({
         <AuthProvider>
           <CartProvider>
             {children}
+            <Analytics />
           </CartProvider>
         </AuthProvider>
       </body>
