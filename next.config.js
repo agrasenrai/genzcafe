@@ -22,5 +22,5 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 }
-
+//blank commit - stage1
 module.exports = nextConfig 
