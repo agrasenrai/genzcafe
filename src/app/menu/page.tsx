@@ -185,7 +185,12 @@ export default function MenuPage() {
             </button>
             {/* Search icon / Close icon when search open */}
             <button
-              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              onClick={() => {
+                if (isSearchOpen) {
+                  setSearchTerm('');
+                }
+                setIsSearchOpen(!isSearchOpen);
+              }}
               className={`p-2 rounded-full transition-colors ${isSearchOpen ? 'bg-gray-100 text-gray-800' : 'text-gray-600 hover:bg-gray-100'}`}
               title={isSearchOpen ? 'Close search' : 'Search'}
               aria-label={isSearchOpen ? 'Close search' : 'Search'}
