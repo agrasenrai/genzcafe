@@ -146,7 +146,7 @@ export default function UserOrdersPage({ params }: PageProps) {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">{formatPrice(order.final_total)}</p>
+                    <p className="font-medium">{formatPrice(Math.round(order.final_total))}</p>
                     <p className="text-sm text-gray-600 mt-1">
                       {order.order_type === 'pickup' ? 'Pickup' : 'Delivery'}
                     </p>

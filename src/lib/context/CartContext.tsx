@@ -125,7 +125,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const applyCoupon = async (code: string, userId?: string | null): Promise<CouponValidationResult> => {
     setCouponLoading(true);
     try {
-      const itemTotal = items.reduce((total, item) => total + (item.price * item.quantity), 0);
+      // Calculate total price with GST first
+      const totalPriceWithGST = items.reduce((total, item) => total + (item.price * item.quantity), 0);
+      // Extract base price (without GST) using the correct formula
+      const itemTotal = Math.round((totalPriceWithGST / 1.05) * 100) / 100;
       const result = await validateCoupon(code, userId || null, itemTotal);
       
       if (result.valid) {
@@ -157,33 +160,42 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   const calculateTotals = async (): Promise<CartTotals> => {
-    const itemTotal = items.reduce((total, item) => total + (item.price * item.quantity), 0);
+    // Calculate total price with GST included
+    const totalPriceWithGST = items.reduce((total, item) => total + (item.price * item.quantity), 0);
     
     try {
       const fees = await getPlatformFees();
       
+      // Calculate base price and GST using the correct formula
+      // base_price = total_price / 1.05
+      // gst_amount = total_price - base_price
+      const basePrice = totalPriceWithGST / 1.05;
+      const gstAmount = totalPriceWithGST - basePrice;
+      
+      // Round the values properly
+      const itemTotal = Math.round(basePrice * 100) / 100;
+      const gst = Math.round(gstAmount * 100) / 100;
+      
       console.log('Fee calculation debug:', {
+        totalPriceWithGST,
         itemTotal,
+        gst,
         gstRate: fees.gstRate,
         platformFeeEnabled: fees.platformFeeEnabled,
         platformFee: fees.platformFee
       });
       
-      // Calculate GST from settings - ensure gstRate is a valid number
-      const gstRate = typeof fees.gstRate === 'number' && fees.gstRate > 0 ? fees.gstRate : 0.05;
-      const gst = itemTotal * gstRate;
-      
       // Platform fee from settings (if enabled)
-      const platformFee = fees.platformFeeEnabled ? (fees.platformFee || 0) : 0;
+      const platformFee = fees.platformFeeEnabled ? (Math.round((fees.platformFee || 0) * 100) / 100) : 0;
       
       // No delivery charge as we only offer pickup
       const deliveryCharge = 0;
       
       // Apply coupon discount
-      const discountAmount = appliedCoupon ? appliedCoupon.discountAmount : 0;
+      const discountAmount = appliedCoupon ? Math.round(appliedCoupon.discountAmount * 100) / 100 : 0;
       
       // Calculate final total
-      const finalTotal = Math.max(0, itemTotal + gst + platformFee + deliveryCharge - discountAmount);
+      const finalTotal = Math.round(Math.max(0, itemTotal + gst + platformFee + deliveryCharge - discountAmount) * 100) / 100;
       
       console.log('Calculated totals:', {
         itemTotal,
@@ -203,14 +215,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       };
     } catch (error) {
       console.error('Error fetching platform fees:', error);
-      // Fallback to hardcoded values
-      const gst = itemTotal * 0.05;
+      // Fallback to hardcoded values using correct formula
+      const basePrice = totalPriceWithGST / 1.05;
+      const gstAmount = totalPriceWithGST - basePrice;
+      
+      const itemTotal = Math.round(basePrice * 100) / 100;
+      const gst = Math.round(gstAmount * 100) / 100;
       const platformFee = 15.00;
       const deliveryCharge = 0;
-      const discountAmount = appliedCoupon ? appliedCoupon.discountAmount : 0;
-      const finalTotal = Math.max(0, itemTotal + gst + platformFee + deliveryCharge - discountAmount);
+      const discountAmount = appliedCoupon ? Math.round(appliedCoupon.discountAmount * 100) / 100 : 0;
+      const finalTotal = Math.round(Math.max(0, itemTotal + gst + platformFee + deliveryCharge - discountAmount) * 100) / 100;
       
       console.log('Using fallback totals:', {
+        totalPriceWithGST,
         itemTotal,
         gst,
         platformFee,

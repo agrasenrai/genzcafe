@@ -672,7 +672,7 @@ export default function CheckoutPage() {
               {/* Bill Details */}
               <div className="space-y-1 text-xs bg-gradient-to-b from-purple-50 to-transparent rounded p-2 -mx-2 mb-2">
                 <div className="flex justify-between text-gray-600">
-                  <span className="font-light">Item Total</span>
+                  <span className="font-light">Item Total (Without GST)</span>
                   <span className="font-medium">₹{totals.itemTotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
@@ -699,7 +699,7 @@ export default function CheckoutPage() {
             <div className="border-t border-gray-200 pt-3 mt-3 bg-gradient-to-r from-yellow-50 to-transparent rounded p-2 -mx-2 -mb-2">
               <div className="flex justify-between items-center">
                 <span className="text-sm font-semibold text-gray-900">Total</span>
-                <span className="text-lg font-semibold text-gray-900">₹{finalAmount.toFixed(2)}</span>
+                <span className="text-lg font-semibold text-gray-900">₹{Math.round(finalAmount)}</span>
               </div>
             </div>
           </div>

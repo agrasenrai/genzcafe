@@ -308,7 +308,7 @@ export default function CartPage() {
           <div className="bg-gray-50 rounded-lg p-3 mb-3 border border-gray-200">
             <div className="space-y-1.5 text-xs">
               <div className="flex justify-between text-gray-700">
-                <span>Item Total</span>
+                <span>Item Total (Without GST)</span>
                 <span className="font-semibold">₹{itemTotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-gray-700">
@@ -333,7 +333,7 @@ export default function CartPage() {
             className="flex items-center justify-between w-full bg-yellow-50 text-yellow-900 px-4 py-3 rounded-lg font-bold border border-gray-900 hover:bg-white active:scale-95 transition-all mb-4"
           >
             <span className="text-sm">Proceed to Checkout</span>
-            <span className="text-sm font-semibold">₹{finalTotal.toFixed(2)}</span>
+            <span className="text-sm font-semibold">₹{Math.round(finalTotal)}</span>
           </Link>
         </div>
       </footer>

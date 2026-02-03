@@ -417,7 +417,7 @@ function TrackOrderContent() {
                     )}
                     <div className="flex justify-between font-semibold pt-2 border-t mt-2">
                       <span>Total</span>
-                      <span>₹{order.finalTotal.toFixed(2)}</span>
+                      <span>₹{Math.round(order.finalTotal)}</span>
                     </div>
                   </div>
                 </div>

@@ -371,7 +371,7 @@ export default function AdminDashboard() {
                           </p>
                         </div>
                         <div className="text-right">
-                          <span className="font-medium">{formatPrice(order.final_total)}</span>
+                          <span className="font-medium">{formatPrice(Math.round(order.final_total))}</span>
                           <p className="text-xs text-gray-500 mt-1">{order.order_type}</p>
                         </div>
                       </div>

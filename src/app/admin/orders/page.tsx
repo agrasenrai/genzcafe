@@ -49,7 +49,9 @@ interface OrderWithFeedback extends Order {
     comment?: string;
   }> | null;
 }
-
+//redpployment test
+//redd
+//redddd
 export default function OrdersPage() {
   const [orders, setOrders] = useState<OrderWithFeedback[]>([]);
   const [loading, setLoading] = useState(true);
@@ -463,7 +465,7 @@ export default function OrdersPage() {
                     <div className="flex flex-col">
                       <span className="text-sm font-medium text-gray-900">#{order.otp}</span>
                       <span className="text-sm text-gray-500">{formatDate(order.created_at)}</span>
-                      <span className="text-sm text-gray-500">{formatPrice(order.final_total)}</span>
+                      <span className="text-sm text-gray-500">{formatPrice(Math.round(order.final_total))}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -680,7 +682,7 @@ export default function OrdersPage() {
                       )}
                       <tr className="font-bold">
                         <td className="px-4 py-2 text-sm text-gray-900" colSpan={2}>Total</td>
-                        <td className="px-4 py-2 text-sm text-gray-900 text-right">{formatPrice(selectedOrder.final_total)}</td>
+                        <td className="px-4 py-2 text-sm text-gray-900 text-right">{formatPrice(Math.round(selectedOrder.final_total))}</td>
                       </tr>
                     </tfoot>
                   </table>
