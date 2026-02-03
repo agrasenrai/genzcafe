@@ -60,6 +60,7 @@ export default function OrdersPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<OrderWithFeedback | null>(null);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   // Notification state
   const prevOrderIdsRef = useRef<Set<string>>(new Set());
   const [showNewOrderAlert, setShowNewOrderAlert] = useState(false);
@@ -184,7 +185,7 @@ export default function OrdersPage() {
     if (statusFilter === 'all') {
       // continue
     } else if (statusFilter === 'active') {
-      if (!['pending', 'confirmed', 'preparing', 'ready'].includes(order.status)) {
+      if (!['pending', 'confirmed', 'preparing'].includes(order.status)) {
         return false;
       }
     } else if (order.status !== statusFilter) {
@@ -229,9 +230,9 @@ export default function OrdersPage() {
   const getNextStatus = (currentStatus: OrderStatus): OrderStatus | undefined => {
     const statusFlow: Record<OrderStatus, OrderStatus | undefined> = {
       'pending': 'confirmed',
-      'confirmed': 'preparing',
+      'confirmed': 'ready',
       'preparing': 'ready',
-      'ready': 'delivered',
+      'ready': undefined,
       'out_for_delivery': undefined,
       'delivered': undefined,
       'cancelled': undefined,
@@ -342,58 +343,90 @@ export default function OrdersPage() {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="statusFilter" className="block text-sm font-medium text-gray-700 mb-1">
-              Filter by Status
-            </label>
-            <select
-              id="statusFilter"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+      <div className={isFullscreen ? 'fixed inset-0 z-40 bg-white overflow-hidden flex flex-col' : ''}>
+        {/* Fullscreen Icon - Visible in both modes */}
+        {isFullscreen && (
+          <div className="absolute top-2 right-2 z-50">
+            <button
+              onClick={() => setIsFullscreen(false)}
+              className="p-1 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition-all shadow-md"
+              title="Exit fullscreen"
             >
-              <option value="all">All Orders</option>
-              <option value="active">Active Orders</option>
-              <option value="pending">Pending</option>
-              <option value="confirmed">Confirmed</option>
-              <option value="preparing">Preparing</option>
-              <option value="ready">Ready</option>
-              <option value="delivered">Delivered</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
-          <div>
-            <label htmlFor="sortBy" className="block text-sm font-medium text-gray-700 mb-1">
-              Sort By
-            </label>
-            <select
-              id="sortBy"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-            >
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-            </select>
-          </div>
-        </div>
-      </div>
+        )}
 
-      {loading ? (
-        <div className="flex justify-center items-center h-40">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-800"></div>
+        {/* Filters */}
+        <div className={`bg-white p-4 rounded-lg shadow-sm mb-6 ${isFullscreen ? 'rounded-none mb-0 flex-shrink-0' : ''}`}>
+          <div className="flex flex-col gap-4">
+            <div className="flex justify-between items-center gap-4">
+              <div className="flex-1">
+                <h3 className="text-sm font-medium text-gray-700 mb-3">Status</h3>
+                <div className="flex flex-wrap gap-3">
+                  {['all', 'active', 'pending', 'confirmed', 'ready', 'cancelled'].map((status) => (
+                    <button
+                      key={status}
+                      onClick={() => setStatusFilter(status)}
+                      className={`px-4 py-3 rounded-lg font-semibold text-base transition-all ${
+                        statusFilter === status
+                          ? 'bg-blue-500 text-white shadow-md'
+                          : 'bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200'
+                      }`}
+                    >
+                      {status === 'all' ? 'All Orders' : status === 'active' ? 'Active Orders' : status.charAt(0).toUpperCase() + status.slice(1)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="flex-shrink-0">
+                <h3 className="text-sm font-medium text-gray-700 mb-3">Sort By</h3>
+                <div className="flex gap-3">
+                  {['newest', 'oldest'].map((sort) => (
+                    <button
+                      key={sort}
+                      onClick={() => setSortBy(sort)}
+                      className={`px-4 py-3 rounded-lg font-semibold text-base transition-all ${
+                        sortBy === sort
+                          ? 'bg-green-500 text-white shadow-md'
+                          : 'bg-green-50 text-green-700 hover:bg-green-100 border border-green-200'
+                      }`}
+                    >
+                      {sort === 'newest' ? 'Newest First' : 'Oldest First'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {!isFullscreen && (
+                <button
+                  onClick={() => setIsFullscreen(true)}
+                  className="p-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition-all shadow-md ml-4"
+                  title="Enter fullscreen"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-5v4m0-4h-4m4 0l-5 5M4 20v-4m0 4h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          </div>
         </div>
-      ) : error ? (
-        <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-6">
-          {error}
-        </div>
-      ) : filteredOrders.length === 0 ? (
-        <div className="text-center py-10">
-          <p className="text-gray-500">No orders found.</p>
-        </div>
+
+        <div className={isFullscreen ? 'flex-1 overflow-y-auto p-6' : ''}>
+          {loading ? (
+          <div className="flex justify-center items-center h-40">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-800"></div>
+          </div>
+        ) : error ? (
+          <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-6">
+            {error}
+          </div>
+        ) : filteredOrders.length === 0 ? (
+          <div className="text-center py-10">
+            <p className="text-gray-500">No orders found.</p>
+          </div>
       ) : (
         <div className="overflow-x-auto bg-white rounded-lg shadow">
           <table className="min-w-full divide-y divide-gray-200">
@@ -518,6 +551,8 @@ export default function OrdersPage() {
           </table>
         </div>
       )}
+        </div>
+      </div>
 
       {/* Order Detail Modal */}
       {modalOpen && selectedOrder && (
@@ -587,7 +622,7 @@ export default function OrdersPage() {
               <div className="mb-4">
                 <h4 className="text-sm font-medium text-gray-500 mb-2">Status</h4>
                 <div className="flex flex-wrap gap-2">
-                  {(['pending', 'confirmed', 'preparing', 'ready', 'delivered', 'cancelled'] as OrderStatus[]).map((status) => (
+                  {(['pending', 'confirmed', 'ready', 'cancelled'] as OrderStatus[]).map((status) => (
                     <button
                       key={status}
                       onClick={() => !updatingStatus && handleStatusUpdate(selectedOrder.id, status)}
