@@ -359,7 +359,7 @@ export default function Home() {
             <div className="w-full px-2 sm:px-0">
               <Link
                 href="/menu"
-                className="group block w-full py-3 sm:py-4 px-6 text-center bg-yellow-50 text-yellow-900 font-bold text-sm sm:text-base rounded-2xl border border-gray-900 shadow-sm hover:bg-white transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                className="group block w-full py-3 sm:py-4 px-6 text-center bg-yellow-50 text-yellow-900 font-bold text-sm sm:text-base rounded-2xl border-2 border-gray-900 shadow-lg hover:shadow-xl hover:bg-white transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] active:shadow-md"
               >
                 <span className="flex items-center justify-center gap-2">
                   Order Now
@@ -382,6 +382,19 @@ export default function Home() {
                   className="object-contain opacity-80"
                 />
               </div>
+            </div>
+
+            {/* Need Help - Bottom */}
+            <div className="flex justify-center pt-2">
+              <a 
+                href="tel:+918925824987" 
+                className="inline-flex items-center gap-1 px-3 py-1.5 text-gray-600 hover:text-gray-900 transition-all text-xs"
+              >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+                <span>Need Help? 8925824987</span>
+              </a>
             </div>
           </div>
         </div>

@@ -330,7 +330,7 @@ export default function CartPage() {
 
           <Link
             href="/checkout"
-            className="flex items-center justify-between w-full bg-yellow-50 text-yellow-900 px-4 py-3 rounded-lg font-bold border border-gray-900 hover:bg-white active:scale-95 transition-all mb-4"
+            className="flex items-center justify-between w-full bg-yellow-50 text-yellow-900 px-4 py-3 rounded-lg font-bold border-2 border-gray-900 shadow-lg hover:shadow-xl hover:bg-white active:shadow-md active:scale-95 transition-all mb-4"
           >
             <span className="text-sm">Proceed to Checkout</span>
             <span className="text-sm font-semibold">₹{Math.round(finalTotal)}</span>
