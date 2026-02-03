@@ -140,18 +140,18 @@ export default function MenuPage() {
   };
 
   return (
-    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col">
+    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col border-2 border-gray-300 rounded-xl shadow-lg">
       {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="px-4 py-4 flex items-center justify-between gap-3 relative">
-          <Link href="/" className="text-gray-800 flex-shrink-0">
+      <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 sticky top-0 z-10">
+        <div className="px-4 py-3 flex items-center justify-between gap-3 relative">
+          <Link href="/" className="text-gray-700 hover:text-gray-900 transition-colors flex-shrink-0">
             <span className="sr-only">Back to Home</span>
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </Link>
           {!isSearchOpen ? (
-            <h1 className="text-xl font-bold text-center absolute left-1/2 -translate-x-1/2">Menu</h1>
+            <h1 className="text-lg font-bold text-center absolute left-1/2 -translate-x-1/2">Menu</h1>
           ) : (
             <div className="flex-1 relative">
               <input
@@ -160,10 +160,10 @@ export default function MenuPage() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 autoFocus
-                className="w-full py-2 pl-9 pr-3 border border-gray-200 rounded-full text-sm bg-gray-50 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                className="w-full py-1.5 pl-8 pr-3 border border-gray-200 rounded-full text-xs bg-gray-50 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
               />
               <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-3.5 w-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
@@ -173,11 +173,11 @@ export default function MenuPage() {
             {/* Pure Veg toggle - green veg icon (Indian veg symbol: circle with dot) */}
             <button
               onClick={() => setIsVegOnly(!isVegOnly)}
-              className={`p-2 rounded-full transition-colors ${isVegOnly ? 'bg-green-100' : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600'}`}
+              className={`p-1.5 rounded-full transition-colors ${isVegOnly ? 'bg-green-100' : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600'}`}
               title={isVegOnly ? 'Pure Veg Only (click to show all)' : 'Show Pure Veg only'}
               aria-label={isVegOnly ? 'Pure Veg filter active' : 'Pure Veg filter'}
             >
-              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isVegOnly ? 'border-green-600 bg-green-50' : 'border-gray-300'}`}>
+              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${isVegOnly ? 'border-green-600 bg-green-50' : 'border-gray-300'}`}>
                 <div className={`w-2 h-2 rounded-full ${isVegOnly ? 'bg-green-600' : 'bg-gray-300'}`} />
               </div>
             </button>

@@ -77,13 +77,13 @@ export default function CheckoutConfirmation() {
 
   if (!order) {
     return (
-      <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white flex flex-col items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-xl font-semibold mb-4">Order Not Found</h1>
-          <p className="mb-6">We couldn't find your order details.</p>
+      <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col border-2 border-gray-300 rounded-xl shadow-lg">
+        <div className="flex flex-col items-center justify-center p-8 text-center">
+          <h1 className="text-lg font-bold mb-2">Order Not Found</h1>
+          <p className="text-sm text-gray-600 mb-4">We couldn't find your order details.</p>
           <Link
             href="/menu"
-            className="inline-block bg-black text-white px-6 py-3 rounded-lg font-medium"
+            className="inline-block bg-black text-white px-6 py-3 rounded-lg font-semibold text-sm hover:bg-gray-900 transition-colors"
           >
             Browse Menu
           </Link>
@@ -95,16 +95,16 @@ export default function CheckoutConfirmation() {
   const orderCancelled = order.status === 'cancelled';
 
   return (
-    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-md mx-auto px-4 py-4 flex items-center">
-          <Link href="/menu" className="text-gray-800">
+    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col border-2 border-gray-300 rounded-xl shadow-lg">
+      <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200">
+        <div className="max-w-md mx-auto px-4 py-3 flex items-center">
+          <Link href="/menu" className="text-gray-700 hover:text-gray-900 transition-colors">
             <span className="sr-only">Back to Menu</span>
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </Link>
-          <h1 className="text-xl font-semibold ml-4">Order Confirmation</h1>
+          <h1 className="text-lg font-bold ml-3 text-gray-900">Order Confirmation</h1>
         </div>
       </header>
 

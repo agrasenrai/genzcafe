@@ -107,16 +107,16 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col">
-        <header className="bg-white shadow-sm">
-          <div className="max-w-md mx-auto px-4 py-4 flex items-center">
-            <Link href="/menu" className="text-gray-800">
+      <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col border-2 border-gray-300 rounded-xl shadow-lg">
+        <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200">
+          <div className="max-w-md mx-auto px-4 py-3 flex items-center">
+            <Link href="/menu" className="text-gray-700 hover:text-gray-900 transition-colors">
               <span className="sr-only">Back to Menu</span>
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </Link>
-            <h1 className="text-xl font-semibold ml-4">Cart</h1>
+            <h1 className="text-lg font-bold ml-3 text-gray-900">Cart</h1>
           </div>
         </header>
         <div className="flex-1 flex flex-col items-center justify-center p-4">
@@ -136,17 +136,17 @@ export default function CartPage() {
   }
 
   return (
-    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-md mx-auto px-4 py-4 flex items-center justify-between">
+    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col border-2 border-gray-300 rounded-xl shadow-lg">
+      <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200">
+        <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center">
-            <Link href="/menu" className="text-gray-800">
+            <Link href="/menu" className="text-gray-700 hover:text-gray-900 transition-colors">
               <span className="sr-only">Back to Menu</span>
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </Link>
-            <h1 className="text-xl font-semibold ml-4">Cart</h1>
+            <h1 className="text-lg font-bold ml-3 text-gray-900">Cart</h1>
           </div>
           <button
             onClick={clearCart}
@@ -160,41 +160,43 @@ export default function CartPage() {
       {/* Scrollable cart items */}
       <main 
         ref={scrollContainerRef} 
-        className="flex-1 p-4 overflow-y-auto relative"
+        className="flex-1 p-3 overflow-y-auto relative"
       >
-        <div className="space-y-4">
+        <div className="space-y-3">
           {items.map((item) => (
-            <div key={item.id} className="bg-white rounded-lg shadow-sm p-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-semibold">{item.name}</h3>
-                  <p className="text-gray-600">₹{item.price.toFixed(2)}</p>
+            <div key={item.id} className="bg-gradient-to-br from-gray-50 to-white rounded-xl shadow-sm border border-gray-100 p-3 hover:shadow-md transition-shadow">
+              <div className="flex justify-between items-start mb-2">
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900 text-sm">{item.name}</h3>
+                  <p className="text-gray-500 text-xs">₹{item.price.toFixed(2)}</p>
                 </div>
                 <button
                   onClick={() => removeItem(item.id)}
-                  className="text-gray-400 hover:text-red-500"
+                  className="text-gray-300 hover:text-red-500 transition-colors ml-2 flex-shrink-0"
                 >
                   <span className="sr-only">Remove item</span>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>
-              <div className="mt-2 flex items-center">
-                <button
-                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                  className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 border rounded-full"
-                >
-                  -
-                </button>
-                <span className="mx-3 min-w-[2rem] text-center">{item.quantity}</span>
-                <button
-                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                  className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 border rounded-full"
-                >
-                  +
-                </button>
-                <div className="ml-auto font-semibold">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 bg-white rounded-lg border border-gray-200 p-1">
+                  <button
+                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                    className="w-6 h-6 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded transition-colors text-sm font-semibold"
+                  >
+                    −
+                  </button>
+                  <span className="w-6 text-center text-sm font-medium text-gray-900">{item.quantity}</span>
+                  <button
+                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                    className="w-6 h-6 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded transition-colors text-sm font-semibold"
+                  >
+                    +
+                  </button>
+                </div>
+                <div className="font-bold text-gray-900 text-sm">
                   ₹{(item.price * item.quantity).toFixed(2)}
                 </div>
               </div>
@@ -223,47 +225,45 @@ export default function CartPage() {
       </main>
 
       {/* Fixed footer with bill details */}
-      <footer className="bg-white border-t shadow-md">
-        <div className="max-w-md mx-auto px-4 py-4">
+      <footer className="bg-white border-t border-gray-200 shadow-lg">
+        <div className="max-w-md mx-auto px-4 py-3">
           {/* Coupon Section */}
           {appliedCoupon ? (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <div>
-                    <p className="font-medium text-green-800 text-sm">{appliedCoupon.code}</p>
-                    <p className="text-xs text-green-600">{appliedCoupon.name}</p>
-                  </div>
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-3 mb-3 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2 min-w-0">
+                <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <div className="min-w-0">
+                  <p className="font-semibold text-green-800 text-sm">{appliedCoupon.code}</p>
+                  <p className="text-xs text-green-600 truncate">{appliedCoupon.name}</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-green-800 text-sm">
-                    -₹{appliedCoupon.discountAmount.toFixed(2)}
-                  </span>
-                  <button
-                    onClick={handleRemoveCoupon}
-                    className="text-red-600 hover:text-red-700 text-xs font-medium"
-                  >
-                    Remove
-                  </button>
-                </div>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <span className="font-bold text-green-800 text-sm whitespace-nowrap">
+                  -₹{appliedCoupon.discountAmount.toFixed(2)}
+                </span>
+                <button
+                  onClick={handleRemoveCoupon}
+                  className="text-red-600 hover:text-red-700 text-xs font-semibold"
+                >
+                  ✕
+                </button>
               </div>
             </div>
           ) : !showCouponInput ? (
             <button
               onClick={() => setShowCouponInput(true)}
-              className="flex items-center text-sm text-yellow-600 mb-4 hover:text-yellow-700 transition-colors"
+              className="w-full flex items-center justify-center gap-2 text-xs font-semibold text-yellow-600 mb-2 hover:text-yellow-700 py-1 rounded-lg hover:bg-yellow-50 transition-all"
             >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
               </svg>
-              Add Coupon Code
+              Add Coupon
             </button>
           ) : (
-            <div className="mb-4">
-              <div className="flex gap-2">
+            <div className="mb-2 p-2 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="flex gap-1.5 mb-1.5">
                 <input
                   type="text"
                   value={couponCode}
@@ -271,76 +271,69 @@ export default function CartPage() {
                     setCouponCode(e.target.value.toUpperCase());
                     setCouponError(null);
                   }}
-                  placeholder="Enter coupon code"
-                  className="flex-1 px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent uppercase"
+                  placeholder="COUPON"
+                  className="flex-1 px-2 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent uppercase"
                   maxLength={15}
                   disabled={couponLoading}
                 />
                 <button
                   onClick={handleApplyCoupon}
                   disabled={couponLoading || !couponCode.trim()}
-                  className="px-4 py-2 text-sm bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center min-w-[70px]"
+                  className="px-3 py-1.5 text-xs font-semibold bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
                 >
                   {couponLoading ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"></div>
                   ) : (
                     'Apply'
                   )}
                 </button>
-                <button
-                  onClick={() => {
-                    setShowCouponInput(false);
-                    setCouponCode('');
-                    setCouponError(null);
-                  }}
-                  className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800"
-                >
-                  Cancel
-                </button>
               </div>
+              <button
+                onClick={() => {
+                  setShowCouponInput(false);
+                  setCouponCode('');
+                  setCouponError(null);
+                }}
+                className="text-xs text-gray-600 hover:text-gray-800 font-medium"
+              >
+                Cancel
+              </button>
               {couponError && (
-                <p className="text-red-600 text-xs mt-2">{couponError}</p>
+                <p className="text-red-600 text-xs mt-1 font-medium">{couponError}</p>
               )}
-              <p className="text-xs text-gray-500 mt-2">
-                Enter a valid coupon code to get discount on your order
-              </p>
             </div>
           )}
 
-          {/* Bill Details */}
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold mb-3">Bill Details</h2>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Item Total</span>
-                <span>₹{itemTotal.toFixed(2)}</span>
+          {/* Bill Details - Compact */}
+          <div className="bg-gray-50 rounded-lg p-3 mb-3 border border-gray-200">
+            <div className="space-y-1.5 text-xs">
+              <div className="flex justify-between text-gray-700">
+                <span>Item Total</span>
+                <span className="font-semibold">₹{itemTotal.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">GST ({taxRate}%)</span>
-                <span>₹{gst.toFixed(2)}</span>
+              <div className="flex justify-between text-gray-700">
+                <span>GST ({taxRate}%)</span>
+                <span className="font-semibold">₹{gst.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Platform Fee</span>
-                <span>₹{platformFee.toFixed(2)}</span>
+              <div className="flex justify-between text-gray-700">
+                <span>Platform Fee</span>
+                <span className="font-semibold">₹{platformFee.toFixed(2)}</span>
               </div>
               {discountAmount > 0 && (
-                <div className="flex justify-between text-green-600">
-                  <span>Discount ({appliedCoupon?.code})</span>
+                <div className="flex justify-between text-green-600 font-semibold border-t border-gray-200 pt-1.5 mt-1.5">
+                  <span>Discount</span>
                   <span>-₹{discountAmount.toFixed(2)}</span>
                 </div>
               )}
             </div>
           </div>
 
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-gray-600">To Pay</span>
-            <span className="text-xl font-semibold">₹{finalTotal.toFixed(2)}</span>
-          </div>
           <Link
             href="/checkout"
-            className="block w-full bg-black text-white text-center py-3 rounded-full font-semibold hover:bg-gray-800 transition-colors"
+            className="flex items-center justify-between w-full bg-black text-white px-4 py-3 rounded-lg font-bold hover:bg-gray-900 active:scale-95 transition-all mb-4"
           >
-            Proceed to Checkout
+            <span className="text-sm">Proceed to Checkout</span>
+            <span className="text-sm font-semibold">₹{finalTotal.toFixed(2)}</span>
           </Link>
         </div>
       </footer>

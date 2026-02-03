@@ -198,25 +198,25 @@ function TrackOrderContent() {
   return (
     <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col">
       <Toaster position="top-center" />
-      <header className="bg-white shadow-sm">
-        <div className="max-w-md mx-auto px-4 py-4 flex items-center">
-          <Link href="/" className="text-gray-800">
+      <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200">
+        <div className="max-w-md mx-auto px-4 py-3 flex items-center">
+          <Link href="/" className="text-gray-700 hover:text-gray-900 transition-colors">
             <span className="sr-only">Back to Home</span>
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </Link>
-          <h1 className="text-xl font-semibold ml-4">Track Order</h1>
+          <h1 className="text-lg font-bold ml-3 text-gray-900">Track Order</h1>
         </div>
       </header>
 
-      <main className="flex-1 overflow-y-auto p-4">
+      <main className="flex-1 overflow-y-auto p-3 bg-white">
         <div className="max-w-md mx-auto">
           {!order ? (
             <>
               <form onSubmit={handleSubmit} className="space-y-4 mb-6">
-                <div className="bg-white rounded-lg p-6 shadow-sm">
-                  <label htmlFor="otp" className="block text-sm font-medium text-gray-700 mb-1">
+                <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                  <label htmlFor="otp" className="block text-xs font-semibold text-gray-700 mb-2">
                     Enter Order Code
                   </label>
                   <input
