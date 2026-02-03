@@ -365,7 +365,7 @@ export default function CheckoutPage() {
         <form onSubmit={handleSubmit} className="space-y-3.5">
           {/* Customer Details */}
           <div className="bg-white rounded-lg p-3.5 shadow-sm border border-gray-200">
-            <h2 className="text-sm font-semibold text-gray-900 mb-3">Your Information</h2>
+            <h2 className="text-sm font-semibold text-gray-900 mb-3 bg-gradient-to-r from-blue-50 to-transparent px-2 py-1.5 rounded -mx-2">Your Information</h2>
             <div className="space-y-3">
               <div>
                 <label htmlFor="name" className="block text-xs font-medium text-gray-700 mb-1.5">
@@ -377,7 +377,7 @@ export default function CheckoutPage() {
                   required
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white text-sm transition-all duration-200 hover:border-gray-300 font-light"
+                  className="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20 focus:border-blue-300 bg-white focus:bg-blue-50 text-sm transition-all duration-200 hover:border-gray-300 font-light"
                   placeholder="Your name"
                 />
               </div>
@@ -392,7 +392,7 @@ export default function CheckoutPage() {
                   required
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white text-sm transition-all duration-200 hover:border-gray-300 font-light"
+                  className="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20 focus:border-blue-300 bg-white focus:bg-blue-50 text-sm transition-all duration-200 hover:border-gray-300 font-light"
                   placeholder="Your phone number"
                 />
               </div>
@@ -402,13 +402,13 @@ export default function CheckoutPage() {
           {/* Pickup Information Section */}
           {deliveryPoints.length > 0 && (
             <div className="bg-white rounded-lg p-3.5 shadow-sm border border-gray-200">
-              <h2 className="text-sm font-semibold text-gray-900 mb-3">Pickup Location</h2>
+              <h2 className="text-sm font-semibold text-gray-900 mb-3 bg-gradient-to-r from-amber-50 to-transparent px-2 py-1.5 rounded -mx-2">Pickup Location</h2>
               <div className="space-y-2">
                 {deliveryPoints.map((point) => (
-                  <label key={point.name} className="flex items-start p-2.5 border border-gray-200 rounded-lg cursor-pointer transition-colors hover:border-gray-300 hover:bg-gray-50"
+                  <label key={point.name} className="flex items-start p-2.5 border border-gray-200 rounded-lg cursor-pointer transition-all hover:border-gray-300 hover:bg-gray-50"
                     style={{
-                      borderColor: selectedDeliveryPoint === point.name ? '#000' : '#e5e7eb',
-                      backgroundColor: selectedDeliveryPoint === point.name ? '#f9fafb' : '#fff'
+                      borderColor: selectedDeliveryPoint === point.name ? '#1e40af' : '#e5e7eb',
+                      backgroundColor: selectedDeliveryPoint === point.name ? '#eff6ff' : '#fff'
                     }}
                   >
                     <input
@@ -582,14 +582,14 @@ export default function CheckoutPage() {
 
           {/* Order Summary */}
           <div className="bg-white rounded-lg p-3.5 shadow-sm border border-gray-200">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">Order Summary</h3>
-            <div className="space-y-1.5 mb-3">
+            <h3 className="text-sm font-semibold text-gray-900 mb-3 bg-gradient-to-r from-green-50 to-transparent px-2 py-1.5 rounded -mx-2">Order Summary</h3>
+            <div className="space-y-2 mb-3 bg-gradient-to-b from-green-50 to-white rounded-lg p-2.5 border border-green-100">
               {items.map((item) => (
-                <div key={item.id} className="flex justify-between text-xs text-gray-700">
-                  <span className="font-light">
+                <div key={item.id} className="flex justify-between text-xs text-gray-700 px-2 py-1.5 bg-white rounded border border-green-200 hover:border-green-300 hover:bg-green-50 transition-colors">
+                  <span className="font-medium text-gray-800">
                     {item.quantity}x {item.name}
                   </span>
-                  <span className="font-medium">₹{(item.price * item.quantity).toFixed(2)}</span>
+                  <span className="font-semibold text-gray-900">₹{(item.price * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
             </div>
@@ -670,7 +670,7 @@ export default function CheckoutPage() {
 
               {/* Bill Details */}
               {/* Bill Details */}
-              <div className="space-y-1 text-xs">
+              <div className="space-y-1 text-xs bg-gradient-to-b from-purple-50 to-transparent rounded p-2 -mx-2 mb-2">
                 <div className="flex justify-between text-gray-600">
                   <span className="font-light">Item Total</span>
                   <span className="font-medium">₹{totals.itemTotal.toFixed(2)}</span>
@@ -696,7 +696,7 @@ export default function CheckoutPage() {
                 )}
               </div>
             </div>
-            <div className="border-t border-gray-200 pt-3 mt-3">
+            <div className="border-t border-gray-200 pt-3 mt-3 bg-gradient-to-r from-yellow-50 to-transparent rounded p-2 -mx-2 -mb-2">
               <div className="flex justify-between items-center">
                 <span className="text-sm font-semibold text-gray-900">Total</span>
                 <span className="text-lg font-semibold text-gray-900">₹{finalAmount.toFixed(2)}</span>
