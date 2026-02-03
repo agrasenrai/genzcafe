@@ -6,11 +6,14 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import { formatPrice } from '@/lib/utils/helpers';
 import { getRestaurantSettings } from '@/lib/supabase/settings';
+import { getTodaysOrders, transformOrdersToRows, calculateDailyStats, formatDateIST } from '@/lib/supabase/reports';
+import { generateDailyReportPDF } from '@/lib/utils/pdfGenerator';
 
 export default function AdminDashboard() {
   const prevOrderIdsRef = useRef<Set<string>>(new Set());
   const [showNewOrderAlert, setShowNewOrderAlert] = useState(false);
   const alertTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const [stats, setStats] = useState({
     totalOrders: 0,
     pendingOrders: 0,
@@ -186,6 +189,50 @@ export default function AdminDashboard() {
     }
     prevOrderIdsRef.current = currentIds;
   }, [recentOrders, isLoading]);
+
+  // Handle download daily report
+  const handleDownloadReport = async () => {
+    try {
+      setIsGeneratingReport(true);
+      
+      // Fetch today's orders
+      const orders = await getTodaysOrders();
+      
+      if (orders.length === 0) {
+        alert('No orders found for today');
+        setIsGeneratingReport(false);
+        return;
+      }
+
+      // Transform orders to rows
+      const reportRows = transformOrdersToRows(orders);
+      
+      // Calculate stats
+      const dailyStats = calculateDailyStats(orders);
+      
+      // Get today's date
+      const today = new Date();
+      const dateString = today.toLocaleDateString('en-IN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      // Generate PDF
+      await generateDailyReportPDF(
+        reportRows,
+        dailyStats,
+        dateString,
+        restaurantInfo.name
+      );
+
+      setIsGeneratingReport(false);
+    } catch (error) {
+      console.error('Error generating report:', error);
+      alert('Failed to generate report. Please try again.');
+      setIsGeneratingReport(false);
+    }
+  };
   
   return (
     <div className="relative">
@@ -196,9 +243,30 @@ export default function AdminDashboard() {
           <span className="font-semibold">New Order Received!</span>
         </div>
       )}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
-        <p className="text-gray-600">Overview of your restaurant business</p>
+      <div className="mb-6 flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
+          <p className="text-gray-600">Overview of your restaurant business</p>
+        </div>
+        <button
+          onClick={handleDownloadReport}
+          disabled={isGeneratingReport}
+          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+        >
+          {isGeneratingReport ? (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+              Generating...
+            </>
+          ) : (
+            <>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3v-6" />
+              </svg>
+              Download Daily Report (PDF)
+            </>
+          )}
+        </button>
       </div>
       
       {error && (
