@@ -192,7 +192,9 @@ export default function CheckoutConfirmation() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Payment Method</span>
-                  <span className="capitalize">{order.paymentMethod}</span>
+                  {/* <span className="capitalize font-semibold bg-yellow-100 px-3 py-1 rounded-full text-yellow-900">{order.paymentMethod}</span> */}
+                  <span className="capitalize font-semibold bg-yellow-100 px-3 py-1 rounded-full text-yellow-900">{"Pay at Counter"}</span>
+
                 </div>
                 {order.paymentId && (
                   <div className="flex justify-between">

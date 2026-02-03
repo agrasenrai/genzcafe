@@ -372,14 +372,14 @@ function TrackOrderContent() {
                     <span className="text-gray-600">Phone:</span>{' '}
                     {order.customer_phone}
                   </p>
-                  <p>
+                {/*   <p>
                     <span className="text-gray-600">Time:</span>{' '}
                     {new Date(order.scheduledTime).toLocaleString()}
                   </p>
                   <p>
                     <span className="text-gray-600">Payment Method:</span>{' '}
                     {order.paymentMethod === 'card' ? 'Card' : 'Cash'}
-                  </p>
+                  </p> */}
                 </div>
               </div>
 

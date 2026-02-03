@@ -13,7 +13,7 @@ export default function CheckoutPage() {
   const { items, clearCart, calculateTotals, appliedCoupon, applyCoupon, removeCoupon, couponLoading } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
   const [scheduledTime, setScheduledTime] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'cash'>('card');
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'cash'>('cash');
   
   // Get current time and max time (6 hours from now) for time picker - dynamic calculation
   const getCurrentTime = () => {
@@ -423,8 +423,8 @@ export default function CheckoutPage() {
               </p>
             )}
           </div>
-
-          {/* Scheduled Time */}
+{/* chedule time and card payment logic commented out 
+          
           <div className="bg-white rounded-lg p-4 shadow-sm">
             <label htmlFor="time" className="block text-sm font-medium text-gray-700 mb-2">
               Pickup Time
@@ -502,7 +502,7 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {/* Payment Method */}
+          
           <div className="bg-white rounded-lg p-4 shadow-sm">
             <h2 className="font-semibold mb-3">Payment Method</h2>
             <div className="flex gap-4">
@@ -519,7 +519,6 @@ export default function CheckoutPage() {
                   Card
                 </button>
               )}
-              {/* Pay on Counter option only for ASAP pickup */}
               {paymentSettings.accept_cash && isASAPPickup && (
                 <button
                   type="button"
@@ -571,6 +570,9 @@ export default function CheckoutPage() {
               </p>
             )}
           </div>
+ */}
+ 
+
 
           {/* Order Summary */}
           <div className="bg-white rounded-lg p-4 shadow-sm">
