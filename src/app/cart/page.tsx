@@ -150,7 +150,7 @@ export default function CartPage() {
           </div>
           <button
             onClick={clearCart}
-            className="text-xs font-semibold px-3 py-1 rounded-full bg-yellow-50 text-yellow-900 border border-gray-900 hover:bg-white"
+            className="text-xs font-semibold px-3 py-1 rounded-full text-red-600 hover:text-red-700"
           >
             Clear Cart
           </button>

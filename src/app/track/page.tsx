@@ -100,11 +100,12 @@ function TrackOrderContent() {
         },
         (payload) => {
           console.log('Order update received:', payload);
-          // Update the order status in real-time
+          // Update the order status and scheduled time in real-time
           if (payload.new) {
             setOrder(prev => prev ? {
               ...prev,
-              status: payload.new.status
+              status: payload.new.status,
+              scheduledTime: payload.new.scheduledTime || prev.scheduledTime
             } : null);
           }
         }
@@ -198,7 +199,7 @@ function TrackOrderContent() {
   return (
     <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-[#FFFDF7] overflow-hidden flex flex-col">
       <Toaster position="top-center" />
-      <header className="bg-[#FFFDF7] border-b border-yellow-200">
+      <header className="bg-[#FFFDF7] border-b border-gray-200">
         <div className="max-w-md mx-auto px-4 py-3 flex items-center">
           <Link href="/" className="text-gray-700 hover:text-gray-900 transition-colors">
             <span className="sr-only">Back to Home</span>
@@ -337,7 +338,7 @@ function TrackOrderContent() {
           ) : (
             <div className="space-y-4">
               {/* Order Status */}
-              <div className="bg-white rounded-lg p-6 shadow-sm">
+              <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="font-semibold">Order Status</h2>
                   <span className={`px-3 py-1 ${getStatusDetails(order.status).color} rounded-full text-sm`}>
@@ -372,19 +373,19 @@ function TrackOrderContent() {
                     <span className="text-gray-600">Phone:</span>{' '}
                     {order.customer_phone}
                   </p>
-                {/*   <p>
-                    <span className="text-gray-600">Time:</span>{' '}
-                    {new Date(order.scheduledTime).toLocaleString()}
+                  <p>
+                    <span className="text-gray-600">Pickup Time:</span>{' '}
+                    {order.scheduledTime === 'ASAP' ? 'As soon as possible' : new Date(order.scheduledTime).toLocaleString()}
                   </p>
                   <p>
                     <span className="text-gray-600">Payment Method:</span>{' '}
-                    {order.paymentMethod === 'card' ? 'Card' : 'Cash'}
-                  </p> */}
+                    {order.paymentMethod === 'card' ? 'Card' : 'Pay at Counter'}
+                  </p>
                 </div>
               </div>
 
               {/* Order Items */}
-              <div className="bg-white rounded-lg p-6 shadow-sm">
+              <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
                 <h2 className="font-semibold mb-4">Order Items</h2>
                 <div className="space-y-2">
                   {order.items.map((item) => (
@@ -428,7 +429,7 @@ function TrackOrderContent() {
               )}
 
               {/* Help Section */}
-              <div className="bg-white rounded-lg p-6 shadow-sm">
+              <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
                 <h2 className="font-semibold mb-4">Need Help?</h2>
                 <div className="space-y-4">
                   <a

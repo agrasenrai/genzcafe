@@ -77,13 +77,13 @@ export default function CheckoutConfirmation() {
 
   if (!order) {
     return (
-      <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col border-2 border-gray-300 rounded-xl shadow-lg">
+      <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-[#FFFDF7] overflow-hidden flex flex-col border-2 border-gray-300 rounded-xl shadow-lg">
         <div className="flex flex-col items-center justify-center p-8 text-center">
           <h1 className="text-lg font-bold mb-2">Order Not Found</h1>
           <p className="text-sm text-gray-600 mb-4">We couldn't find your order details.</p>
           <Link
             href="/menu"
-            className="inline-block bg-black text-white px-6 py-3 rounded-lg font-semibold text-sm hover:bg-gray-900 transition-colors"
+            className="inline-block bg-yellow-50 text-yellow-900 px-6 py-3 rounded-lg font-semibold text-sm border border-gray-900 hover:bg-white transition-colors"
           >
             Browse Menu
           </Link>
@@ -95,8 +95,8 @@ export default function CheckoutConfirmation() {
   const orderCancelled = order.status === 'cancelled';
 
   return (
-    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col border-2 border-gray-300 rounded-xl shadow-lg">
-      <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200">
+    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-[#FFFDF7] overflow-hidden flex flex-col border-2 border-gray-300 rounded-xl shadow-lg">
+      <header className="bg-[#FFFDF7] border-b border-gray-200">
         <div className="max-w-md mx-auto px-4 py-3 flex items-center">
           <Link href="/menu" className="text-gray-700 hover:text-gray-900 transition-colors">
             <span className="sr-only">Back to Menu</span>
@@ -123,7 +123,7 @@ export default function CheckoutConfirmation() {
               </p>
               <Link
                 href="/checkout"
-                className="inline-block bg-black text-white px-6 py-3 rounded-lg font-medium"
+                className="inline-block bg-yellow-50 text-yellow-900 px-6 py-3 rounded-lg font-medium border border-gray-900 hover:bg-white transition-colors"
               >
                 Try Again
               </Link>
@@ -169,7 +169,7 @@ export default function CheckoutConfirmation() {
         {!orderCancelled && (
           <>
             {/* Order Information */}
-            <div className="bg-white rounded-lg p-6 shadow-sm mb-4">
+            <div className="bg-white rounded-lg p-6 shadow-sm mb-4 border border-gray-200">
               <h2 className="font-semibold mb-4">Order Information</h2>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
@@ -210,7 +210,7 @@ export default function CheckoutConfirmation() {
             </div>
 
             {/* Customer Information */}
-            <div className="bg-white rounded-lg p-6 shadow-sm mb-4">
+            <div className="bg-white rounded-lg p-6 shadow-sm mb-4 border border-gray-200">
               <h2 className="font-semibold mb-4">Customer Information</h2>
               <div className="space-y-2 text-sm">
                 <div>
@@ -228,7 +228,7 @@ export default function CheckoutConfirmation() {
             </div>
 
             {/* Order Items */}
-            <div className="bg-white rounded-lg p-6 shadow-sm">
+            <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
               <h2 className="font-semibold mb-4">Order Items</h2>
               <div className="space-y-2">
                 {order.items.map((item) => (
@@ -278,10 +278,10 @@ export default function CheckoutConfirmation() {
       
       {/* Fixed Track Order Button */}
       {!orderCancelled && (
-        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl bg-white border-t border-gray-200 p-4">
+        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl bg-[#FFFDF7] border-t border-gray-200 p-4">
           <Link
             href={`/track?otp=${order.otp}`}
-            className="block w-full bg-black text-white text-center py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors"
+            className="block w-full bg-yellow-50 text-yellow-900 text-center py-3 rounded-lg font-medium border border-gray-900 hover:bg-white transition-colors"
           >
             Track Order
           </Link>
