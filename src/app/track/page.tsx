@@ -196,9 +196,9 @@ function TrackOrderContent() {
   const canLeaveFeedback = order?.status === 'delivered';
 
   return (
-    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col">
+    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-[#FFFDF7] overflow-hidden flex flex-col">
       <Toaster position="top-center" />
-      <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200">
+      <header className="bg-[#FFFDF7] border-b border-yellow-200">
         <div className="max-w-md mx-auto px-4 py-3 flex items-center">
           <Link href="/" className="text-gray-700 hover:text-gray-900 transition-colors">
             <span className="sr-only">Back to Home</span>
@@ -210,7 +210,7 @@ function TrackOrderContent() {
         </div>
       </header>
 
-      <main className="flex-1 overflow-y-auto p-3 bg-white">
+      <main className="flex-1 overflow-y-auto p-3 bg-[#FFFDF7]">
         <div className="max-w-md mx-auto">
           {!order ? (
             <>
@@ -236,7 +236,7 @@ function TrackOrderContent() {
                   <button
                     type="submit"
                     disabled={isLoading || otp.length !== 6}
-                    className="w-full mt-4 bg-black text-white py-3 rounded-full font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full mt-4 bg-yellow-50 text-yellow-900 py-3 rounded-full font-semibold border border-gray-900 hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isLoading ? 'Searching...' : 'Track Order'}
                   </button>
@@ -251,7 +251,7 @@ function TrackOrderContent() {
                       <div className="w-full border-t border-gray-200"></div>
                     </div>
                     <div className="relative flex justify-center">
-                      <span className="bg-white px-4 text-sm text-gray-500">or choose from recent orders</span>
+                      <span className="bg-[#FFFDF7] px-4 text-sm text-gray-500">or choose from recent orders</span>
                     </div>
                   </div>
 

@@ -140,10 +140,10 @@ export default function MenuPage() {
   };
 
   return (
-    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col border-2 border-gray-300 rounded-xl shadow-lg">
+    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-[#FFFDF7] overflow-hidden flex flex-col border-2 border-gray-300 rounded-xl shadow-lg">
       {/* Header */}
-      <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 sticky top-0 z-10">
-        <div className="px-4 py-3 flex items-center justify-between gap-3 relative">
+      <header className="bg-[#FFFDF7] border-b border-yellow-200 sticky top-0 z-10">
+        <div className="px-4 py-3 flex items-center gap-3">
           <Link href="/" className="text-gray-700 hover:text-gray-900 transition-colors flex-shrink-0">
             <span className="sr-only">Back to Home</span>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,7 +151,7 @@ export default function MenuPage() {
             </svg>
           </Link>
           {!isSearchOpen ? (
-            <h1 className="text-lg font-bold text-center absolute left-1/2 -translate-x-1/2">Menu</h1>
+            <h1 className="text-lg font-bold text-gray-900">Menu</h1>
           ) : (
             <div className="flex-1 relative">
               <input
@@ -169,7 +169,7 @@ export default function MenuPage() {
               </div>
             </div>
           )}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
             {/* Pure Veg toggle - green veg icon (Indian veg symbol: circle with dot) */}
             <button
               onClick={() => setIsVegOnly(!isVegOnly)}
@@ -207,11 +207,12 @@ export default function MenuPage() {
         </div>
 
         {/* Categories - only when search is closed, or always show */}
-        <div className="px-4 pb-3 border-b border-gray-100">
-          <div className="flex overflow-x-auto py-1 scrollbar-hide gap-2">
+        <div className="px-4 pb-3 border-b border-yellow-100">
+          <div className="relative group">
+            <div className="flex overflow-x-auto py-1 scrollbar-hide gap-2 pr-6">
             <button
               className={`px-3 py-1.5 text-sm whitespace-nowrap rounded-full flex-shrink-0 ${
-                selectedCategory === null ? 'bg-black text-white' : 'bg-gray-100 text-gray-800'
+                selectedCategory === null ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white' : 'bg-amber-100 text-amber-900'
               }`}
               onClick={() => setSelectedCategory(null)}
             >
@@ -221,13 +222,21 @@ export default function MenuPage() {
               <button
                 key={category}
                 className={`px-3 py-1.5 text-sm whitespace-nowrap rounded-full flex-shrink-0 ${
-                  selectedCategory === category ? 'bg-black text-white' : 'bg-gray-100 text-gray-800'
+                  selectedCategory === category ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white' : 'bg-amber-100 text-amber-900'
                 }`}
                 onClick={() => setSelectedCategory(category)}
               >
                 {category}
               </button>
             ))}
+          </div>
+            <div className="pointer-events-none absolute right-0 top-0 h-full flex items-center pr-1 opacity-60 group-hover:opacity-100 transition-opacity">
+              <div className="bg-[#FFFDF7] pl-2">
+                <svg className="w-4 h-4 text-yellow-700 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
       </header>
@@ -260,7 +269,7 @@ export default function MenuPage() {
             <div className="mt-6">
               <button
                 type="button"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-black hover:bg-gray-800"
+                className="inline-flex items-center px-4 py-2 border border-gray-900 text-sm font-medium rounded-md shadow-sm text-yellow-900 bg-yellow-50 hover:bg-white"
                 onClick={() => {
                   setSearchTerm('');
                   setSelectedCategory(null);
@@ -281,15 +290,15 @@ export default function MenuPage() {
             className="mt-4"
             ref={el => { categoryRefs.current[category] = el; }}
           >
-            <div className="px-4 mb-2 flex items-center justify-between">
-              <h2 className="text-2xl font-bold">{category}</h2>
-              <span className="text-xs text-gray-400">{items.length} items</span>
+            <div className="px-4 mb-1 flex items-center justify-between">
+              <h2 className="text-lg font-bold">{category}</h2>
+              <span className="text-[10px] text-gray-500">{items.length} items</span>
             </div>
-            <div className="px-4 space-y-4">
+            <div className="px-4 space-y-2">
               {items.map((item) => (
                 <div
                   key={item.id}
-                  className={`rounded-2xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition-shadow ${!item.available ? 'opacity-60' : ''}`}
+                  className={`rounded-xl border border-gray-100 bg-white p-2.5 shadow-sm hover:shadow-md transition-shadow ${!item.available ? 'opacity-60' : ''}`}
                   onClick={() => {
                     if (item.available) {
                       setSelectedItem(item);
@@ -297,12 +306,12 @@ export default function MenuPage() {
                     }
                   }}
                 >
-                  <div className="flex gap-3">
+                  <div className="flex gap-2">
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start gap-2">
                         <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-semibold text-[15px] text-gray-900 leading-snug">
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <h3 className="font-semibold text-[13px] text-gray-900 leading-snug">
                               {item.name}
                             </h3>
                             {item.is_veg && item.available && (
@@ -326,22 +335,22 @@ export default function MenuPage() {
                           </div>
                         )}
                       </div>
-                      <p className="mt-1 text-sm text-gray-500 line-clamp-2">
+                      <p className="mt-0.5 text-[11px] text-gray-500 line-clamp-2">
                         {item.description}
                       </p>
-                      <div className="mt-3 flex items-center justify-between">
-                        <div className="text-base font-semibold text-gray-900">
+                      <div className="mt-1.5 flex items-center justify-between">
+                        <div className="text-[13px] font-semibold text-gray-900">
                           ₹{item.price.toFixed(2)}
                         </div>
                         
                         {!item.available ? (
-                          <div className="px-4 py-1.5 text-xs font-semibold text-gray-400 bg-gray-100 rounded-full uppercase cursor-not-allowed">
+                          <div className="px-2.5 py-0.5 text-[10px] font-semibold text-gray-400 bg-gray-100 rounded-full uppercase cursor-not-allowed">
                             Out of Stock
                           </div>
                         ) : quantities[item.id] ? (
                           <div className="flex items-center">
                             <button 
-                              className="w-8 h-8 flex items-center justify-center text-green-700 border border-green-600 rounded-full hover:bg-green-50"
+                              className="w-7 h-7 flex items-center justify-center text-yellow-900 bg-yellow-50 border border-yellow-300 rounded-full hover:bg-white"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleQuantityChange(item.id, quantities[item.id] - 1);
@@ -349,9 +358,9 @@ export default function MenuPage() {
                             >
                               -
                             </button>
-                            <span className="mx-3 min-w-[1.5rem] text-center">{quantities[item.id]}</span>
+                            <span className="mx-2 min-w-[1.2rem] text-center text-[12px]">{quantities[item.id]}</span>
                             <button 
-                              className="w-8 h-8 flex items-center justify-center text-green-700 border border-green-600 rounded-full hover:bg-green-50"
+                              className="w-7 h-7 flex items-center justify-center text-yellow-900 bg-yellow-50 border border-yellow-300 rounded-full hover:bg-white"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleQuantityChange(item.id, quantities[item.id] + 1);
@@ -362,7 +371,7 @@ export default function MenuPage() {
                           </div>
                         ) : (
                           <button
-                            className="px-4 py-1.5 text-xs font-semibold text-green-700 border border-green-600 rounded-full uppercase hover:bg-green-50"
+                            className="px-3 py-1 text-[11px] font-semibold text-yellow-900 bg-yellow-50 border border-gray-900 rounded-full uppercase hover:bg-white"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleAddToCart(item);
@@ -458,18 +467,18 @@ export default function MenuPage() {
                 </div>
               ) : quantities[selectedItem.id] ? (
                 <div className="mt-6 flex items-center justify-center">
-                  <div className="flex items-center border-2 border-black rounded-lg overflow-hidden">
+                  <div className="flex items-center border-2 border-gray-900 rounded-lg overflow-hidden">
                     <button 
-                      className="w-12 h-12 flex items-center justify-center text-black bg-white hover:bg-gray-50 font-bold text-xl transition-colors"
+                      className="w-12 h-12 flex items-center justify-center text-yellow-900 bg-yellow-50 hover:bg-white font-bold text-xl transition-colors"
                       onClick={() => handleQuantityChange(selectedItem.id, quantities[selectedItem.id] - 1)}
                     >
                       -
                     </button>
-                    <div className="w-16 h-12 flex items-center justify-center text-xl font-bold bg-white border-l border-r border-black">
+                    <div className="w-16 h-12 flex items-center justify-center text-xl font-bold bg-white border-l border-r border-gray-900">
                       {quantities[selectedItem.id]}
                     </div>
                     <button 
-                      className="w-12 h-12 flex items-center justify-center text-white bg-black hover:bg-gray-800 font-bold text-xl transition-colors"
+                      className="w-12 h-12 flex items-center justify-center text-yellow-900 bg-yellow-50 hover:bg-white font-bold text-xl transition-colors"
                       onClick={() => handleQuantityChange(selectedItem.id, quantities[selectedItem.id] + 1)}
                     >
                       +
@@ -481,7 +490,7 @@ export default function MenuPage() {
                   onClick={() => {
                     handleAddToCart(selectedItem);
                   }}
-                  className="mt-6 w-full py-3 bg-black text-white font-medium rounded-lg"
+                  className="mt-6 w-full py-3 bg-yellow-50 text-yellow-900 font-medium rounded-lg border border-gray-900 hover:bg-white"
                 >
                   ADD
                 </button>
@@ -494,9 +503,9 @@ export default function MenuPage() {
       {/* Cart floating pill - updated to be more stretched and fully clickable */}
       {cartItems.length > 0 && (
         <Link href="/cart">
-          <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-[95%] max-w-md mx-auto bg-black text-white py-3 px-6 rounded-full flex justify-between items-center shadow-lg z-20 cursor-pointer hover:bg-gray-800 transition-all">
+          <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-[95%] max-w-md mx-auto bg-yellow-50 text-yellow-900 py-3 px-6 rounded-full flex justify-between items-center shadow-lg z-20 cursor-pointer hover:bg-white transition-all border border-gray-900">
             <div className="flex items-center">
-              <div className="bg-white text-black rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium mr-2">
+              <div className="bg-yellow-100 text-yellow-900 rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium mr-2">
                 {cartItems.reduce((total, item) => total + item.quantity, 0)}
               </div>
               <span className="font-medium">View Cart</span>
@@ -510,7 +519,7 @@ export default function MenuPage() {
       <div className="fixed bottom-20 right-4 z-10">
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="w-12 h-12 rounded-full bg-black flex items-center justify-center shadow-lg text-white"
+          className="w-12 h-12 rounded-full bg-yellow-50 flex items-center justify-center shadow-lg text-yellow-900 hover:bg-white border border-gray-900"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />

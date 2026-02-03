@@ -249,7 +249,7 @@ export default function Home() {
   }
   
   return (
-    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden">
+    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-[#FFFDF7] overflow-hidden">
       {/* GenZ Background Image */}
       <div className="absolute inset-0">
         <Image
@@ -262,7 +262,7 @@ export default function Home() {
         />
         
         {/* Light overlay for brightness */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-white/30 to-white/20" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#FFFDF7]/40 via-[#FFFDF7]/30 to-[#FFFDF7]/20" />
         
         {/* Subtle geometric accents over the background */}
         <div className="absolute top-16 right-6 w-24 h-24 bg-yellow-500/20 rounded-full blur-2xl" />
@@ -346,7 +346,7 @@ export default function Home() {
             <div className="flex justify-center">
               <Link 
                 href="/track" 
-                className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-white/60 backdrop-blur-sm rounded-full border border-yellow-200/50 shadow-sm text-xs sm:text-sm text-gray-600 hover:text-yellow-600 hover:border-yellow-400/50 hover:bg-white/80 transition-all duration-300 group"
+                className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-yellow-50 text-yellow-800 rounded-full border border-gray-900 shadow-sm text-xs sm:text-sm hover:bg-white transition-all duration-300 group"
               >
                 <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -359,7 +359,7 @@ export default function Home() {
             <div className="w-full px-2 sm:px-0">
               <Link
                 href="/menu"
-                className="group block w-full py-3 sm:py-4 px-6 text-center bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-bold text-sm sm:text-base rounded-2xl shadow-lg hover:shadow-xl hover:shadow-yellow-500/25 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                className="group block w-full py-3 sm:py-4 px-6 text-center bg-yellow-50 text-yellow-900 font-bold text-sm sm:text-base rounded-2xl border border-gray-900 shadow-sm hover:bg-white transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
               >
                 <span className="flex items-center justify-center gap-2">
                   Order Now

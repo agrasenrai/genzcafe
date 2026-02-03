@@ -342,8 +342,8 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col border border-gray-200 rounded-2xl shadow-xl">
-      <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200">
+    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-[#FFFDF7] overflow-hidden flex flex-col border border-gray-200 rounded-2xl shadow-xl">
+      <header className="bg-[#FFFDF7] border-b border-yellow-200">
         <div className="max-w-md mx-auto px-4 py-3 flex items-center">
           <Link href="/cart" className="text-gray-700 hover:text-gray-900 transition-colors">
             <span className="sr-only">Back to Cart</span>
@@ -355,7 +355,7 @@ export default function CheckoutPage() {
         </div>
       </header>
 
-      <main className="flex-1 overflow-y-auto p-4 bg-white">
+      <main className="flex-1 overflow-y-auto p-4 bg-[#FFFDF7]">
         {orderError && (
           <div className="mb-3 p-2.5 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
             {orderError}
@@ -365,7 +365,7 @@ export default function CheckoutPage() {
         <form onSubmit={handleSubmit} className="space-y-3.5">
           {/* Customer Details */}
           <div className="bg-white rounded-lg p-3.5 shadow-sm border border-gray-200">
-            <h2 className="text-sm font-semibold text-gray-900 mb-3 bg-gradient-to-r from-blue-50 to-transparent px-2 py-1.5 rounded -mx-2">Your Information</h2>
+            <h2 className="text-sm font-semibold text-gray-900 mb-3 bg-gradient-to-r from-yellow-50 to-transparent px-2 py-1.5 rounded -mx-2">Your Information</h2>
             <div className="space-y-3">
               <div>
                 <label htmlFor="name" className="block text-xs font-medium text-gray-700 mb-1.5">
@@ -377,7 +377,7 @@ export default function CheckoutPage() {
                   required
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20 focus:border-blue-300 bg-white focus:bg-blue-50 text-sm transition-all duration-200 hover:border-gray-300 font-light"
+                  className="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-20 focus:border-yellow-300 bg-white focus:bg-yellow-50 text-sm transition-all duration-200 hover:border-gray-300 font-light"
                   placeholder="Your name"
                 />
               </div>
@@ -392,7 +392,7 @@ export default function CheckoutPage() {
                   required
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20 focus:border-blue-300 bg-white focus:bg-blue-50 text-sm transition-all duration-200 hover:border-gray-300 font-light"
+                  className="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-20 focus:border-yellow-300 bg-white focus:bg-yellow-50 text-sm transition-all duration-200 hover:border-gray-300 font-light"
                   placeholder="Your phone number"
                 />
               </div>
@@ -582,10 +582,10 @@ export default function CheckoutPage() {
 
           {/* Order Summary */}
           <div className="bg-white rounded-lg p-3.5 shadow-sm border border-gray-200">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3 bg-gradient-to-r from-green-50 to-transparent px-2 py-1.5 rounded -mx-2">Order Summary</h3>
-            <div className="space-y-2 mb-3 bg-gradient-to-b from-green-50 to-white rounded-lg p-2.5 border border-green-100">
+            <h3 className="text-sm font-semibold text-gray-900 mb-3 bg-gradient-to-r from-yellow-50 to-transparent px-2 py-1.5 rounded -mx-2">Order Summary</h3>
+            <div className="space-y-2 mb-3 bg-gradient-to-b from-yellow-50 to-white rounded-lg p-2.5 border border-yellow-100">
               {items.map((item) => (
-                <div key={item.id} className="flex justify-between text-xs text-gray-700 px-2 py-1.5 bg-white rounded border border-green-200 hover:border-green-300 hover:bg-green-50 transition-colors">
+                <div key={item.id} className="flex justify-between text-xs text-gray-700 px-2 py-1.5 bg-white rounded border border-yellow-200 hover:border-yellow-300 hover:bg-yellow-50 transition-colors">
                   <span className="font-medium text-gray-800">
                     {item.quantity}x {item.name}
                   </span>
@@ -597,12 +597,12 @@ export default function CheckoutPage() {
             {/* Coupon Management Section */}
             <div className="border-t border-gray-200 pt-3 mt-3">
               {appliedCoupon ? (
-                <div className="mb-2 flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-lg p-2">
+                <div className="mb-2 flex items-center justify-between bg-yellow-50 border border-yellow-200 rounded-lg p-2">
                   <div className="flex items-center gap-2 min-w-0">
-                    <svg className="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-4 h-4 text-yellow-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
-                    <span className="text-xs font-semibold text-emerald-800 tracking-wide">{appliedCoupon.code}</span>
+                    <span className="text-xs font-semibold text-yellow-800 tracking-wide">{appliedCoupon.code}</span>
                   </div>
                   <button
                     type="button"
@@ -616,7 +616,7 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={() => setShowCouponInput(true)}
-                  className="mb-2 w-full flex items-center justify-center gap-2 text-xs font-semibold text-gray-700 py-2 rounded-lg border border-gray-300 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  className="mb-2 w-full flex items-center justify-center gap-2 text-xs font-semibold text-yellow-600 py-1 rounded-lg hover:text-yellow-700 hover:bg-yellow-50 transition-all"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
@@ -642,7 +642,7 @@ export default function CheckoutPage() {
                       type="button"
                       onClick={handleApplyCoupon}
                       disabled={couponLoading || !couponCode.trim()}
-                      className="px-3 py-1.5 text-xs font-semibold bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+                      className="px-3 py-1.5 text-xs font-semibold bg-yellow-50 text-yellow-900 border border-gray-900 rounded-lg hover:bg-white disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
                     >
                       {couponLoading ? (
                         <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"></div>
@@ -684,7 +684,7 @@ export default function CheckoutPage() {
                   <span className="font-medium">₹{totals.platformFee.toFixed(2)}</span>
                 </div>
                 {totals.discountAmount > 0 && (
-                  <div className="flex justify-between text-emerald-600 items-center border-t border-gray-100 pt-1 mt-1">
+                  <div className="flex justify-between text-yellow-700 items-center border-t border-gray-100 pt-1 mt-1">
                     <span className="flex items-center gap-1 font-light">
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
@@ -710,7 +710,7 @@ export default function CheckoutPage() {
             className={`w-full py-3 rounded-lg font-semibold text-sm transition-colors ${
               isProcessing || (!paymentSettings.accept_credit_cards && !paymentSettings.accept_cash)
                 ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                : 'bg-gray-900 text-white hover:bg-gray-800'
+                : 'bg-yellow-50 text-yellow-900 border border-gray-900 hover:bg-white'
             }`}
           >
             {isProcessing ? (
@@ -804,17 +804,17 @@ function CouponInput({
       </div>
 
       {appliedCoupon ? (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-green-800">{appliedCoupon.code}</p>
-              <p className="text-sm text-green-600">{appliedCoupon.name}</p>
+              <p className="font-medium text-yellow-800">{appliedCoupon.code}</p>
+              <p className="text-sm text-yellow-700">{appliedCoupon.name}</p>
               {appliedCoupon.description && (
-                <p className="text-xs text-green-500 mt-1">{appliedCoupon.description}</p>
+                <p className="text-xs text-yellow-600 mt-1">{appliedCoupon.description}</p>
               )}
             </div>
             <div className="text-right">
-              <p className="font-medium text-green-800">
+              <p className="font-medium text-yellow-800">
                 -₹{appliedCoupon.discountAmount.toFixed(2)}
               </p>
             </div>

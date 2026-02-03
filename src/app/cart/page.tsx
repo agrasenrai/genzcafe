@@ -107,8 +107,8 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col border-2 border-gray-300 rounded-xl shadow-lg">
-        <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200">
+      <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-[#FFFDF7] overflow-hidden flex flex-col border-2 border-gray-300 rounded-xl shadow-lg">
+        <header className="bg-[#FFFDF7] border-b border-yellow-200">
           <div className="max-w-md mx-auto px-4 py-3 flex items-center">
             <Link href="/menu" className="text-gray-700 hover:text-gray-900 transition-colors">
               <span className="sr-only">Back to Menu</span>
@@ -126,7 +126,7 @@ export default function CartPage() {
           <p className="text-gray-600 mb-4">Your cart is empty</p>
           <Link
             href="/menu"
-            className="bg-black text-white px-6 py-3 rounded-full font-semibold hover:bg-gray-800 transition-colors"
+            className="bg-yellow-50 text-yellow-900 px-6 py-3 rounded-full font-semibold border border-gray-900 hover:bg-white transition-colors"
           >
             Browse Menu
           </Link>
@@ -136,8 +136,8 @@ export default function CartPage() {
   }
 
   return (
-    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col border-2 border-gray-300 rounded-xl shadow-lg">
-      <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200">
+    <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-[#FFFDF7] overflow-hidden flex flex-col border-2 border-gray-300 rounded-xl shadow-lg">
+      <header className="bg-[#FFFDF7] border-b border-yellow-200">
         <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center">
             <Link href="/menu" className="text-gray-700 hover:text-gray-900 transition-colors">
@@ -150,7 +150,7 @@ export default function CartPage() {
           </div>
           <button
             onClick={clearCart}
-            className="text-sm text-red-600 hover:text-red-800"
+            className="text-xs font-semibold px-3 py-1 rounded-full bg-yellow-50 text-yellow-900 border border-gray-900 hover:bg-white"
           >
             Clear Cart
           </button>
@@ -160,7 +160,7 @@ export default function CartPage() {
       {/* Scrollable cart items */}
       <main 
         ref={scrollContainerRef} 
-        className="flex-1 p-3 overflow-y-auto relative"
+        className="flex-1 p-3 overflow-y-auto relative bg-[#FFFDF7]"
       >
         <div className="space-y-3">
           {items.map((item) => (
@@ -330,7 +330,7 @@ export default function CartPage() {
 
           <Link
             href="/checkout"
-            className="flex items-center justify-between w-full bg-black text-white px-4 py-3 rounded-lg font-bold hover:bg-gray-900 active:scale-95 transition-all mb-4"
+            className="flex items-center justify-between w-full bg-yellow-50 text-yellow-900 px-4 py-3 rounded-lg font-bold border border-gray-900 hover:bg-white active:scale-95 transition-all mb-4"
           >
             <span className="text-sm">Proceed to Checkout</span>
             <span className="text-sm font-semibold">₹{finalTotal.toFixed(2)}</span>
