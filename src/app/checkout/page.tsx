@@ -343,35 +343,32 @@ export default function CheckoutPage() {
 
   return (
     <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-white overflow-hidden flex flex-col border border-gray-200 rounded-2xl shadow-xl">
-      <header className="bg-gradient-to-b from-white via-white to-gray-50 border-b border-gray-200 shadow-sm">
-        <div className="max-w-md mx-auto px-4 py-4 flex items-center gap-3">
-          <Link href="/cart" className="text-gray-400 hover:text-gray-900 transition-colors duration-200 hover:bg-gray-100 p-1 rounded-lg">
+      <header className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200">
+        <div className="max-w-md mx-auto px-4 py-3 flex items-center">
+          <Link href="/cart" className="text-gray-700 hover:text-gray-900 transition-colors">
             <span className="sr-only">Back to Cart</span>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </Link>
-          <div className="flex-1">
-            <h1 className="text-lg font-light tracking-widest text-gray-900 uppercase">Checkout</h1>
-            <p className="text-xs text-gray-400 font-light">Complete your order</p>
-          </div>
+          <h1 className="text-lg font-bold ml-3 text-gray-900">Checkout</h1>
         </div>
       </header>
 
-      <main className="flex-1 overflow-y-auto p-4 bg-gradient-to-b from-white to-gray-50">
+      <main className="flex-1 overflow-y-auto p-4 bg-white">
         {orderError && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs shadow-sm">
+          <div className="mb-3 p-2.5 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
             {orderError}
           </div>
         )}
         
-        <form onSubmit={handleSubmit} className="space-y-4 mb-4">
+        <form onSubmit={handleSubmit} className="space-y-3.5">
           {/* Customer Details */}
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
-            <h2 className="font-light text-sm tracking-wide text-gray-900 mb-4 uppercase text-gray-700">Your Information</h2>
-            <div className="space-y-3.5">
+          <div className="bg-white rounded-lg p-3.5 shadow-sm border border-gray-200">
+            <h2 className="text-sm font-semibold text-gray-900 mb-3">Your Information</h2>
+            <div className="space-y-3">
               <div>
-                <label htmlFor="name" className="block text-xs font-medium text-gray-600 mb-1.5 uppercase tracking-widest">
+                <label htmlFor="name" className="block text-xs font-medium text-gray-700 mb-1.5">
                   Name*
                 </label>
                 <input
@@ -386,7 +383,7 @@ export default function CheckoutPage() {
               </div>
               
               <div>
-                <label htmlFor="phone" className="block text-xs font-medium text-gray-600 mb-1.5 uppercase tracking-widest">
+                <label htmlFor="phone" className="block text-xs font-medium text-gray-700 mb-1.5">
                   Phone Number*
                 </label>
                 <input
@@ -404,11 +401,11 @@ export default function CheckoutPage() {
 
           {/* Pickup Information Section */}
           {deliveryPoints.length > 0 && (
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
-              <h2 className="font-light text-sm tracking-wide text-gray-900 mb-4 uppercase text-gray-700">Pickup Location</h2>
-              <div className="space-y-2.5">
+            <div className="bg-white rounded-lg p-3.5 shadow-sm border border-gray-200">
+              <h2 className="text-sm font-semibold text-gray-900 mb-3">Pickup Location</h2>
+              <div className="space-y-2">
                 {deliveryPoints.map((point) => (
-                  <label key={point.name} className="flex items-start p-3 border border-gray-200 rounded-lg cursor-pointer transition-all duration-200 hover:border-gray-400 hover:bg-gray-50"
+                  <label key={point.name} className="flex items-start p-2.5 border border-gray-200 rounded-lg cursor-pointer transition-colors hover:border-gray-300 hover:bg-gray-50"
                     style={{
                       borderColor: selectedDeliveryPoint === point.name ? '#000' : '#e5e7eb',
                       backgroundColor: selectedDeliveryPoint === point.name ? '#f9fafb' : '#fff'
@@ -584,9 +581,9 @@ export default function CheckoutPage() {
 
 
           {/* Order Summary */}
-          <div className="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100">
-            <h3 className="font-light text-sm tracking-wide uppercase text-gray-700 mb-4">Order Summary</h3>
-            <div className="space-y-1.5 mb-4">
+          <div className="bg-white rounded-lg p-3.5 shadow-sm border border-gray-200">
+            <h3 className="text-sm font-semibold text-gray-900 mb-3">Order Summary</h3>
+            <div className="space-y-1.5 mb-3">
               {items.map((item) => (
                 <div key={item.id} className="flex justify-between text-xs text-gray-700">
                   <span className="font-light">
@@ -598,9 +595,9 @@ export default function CheckoutPage() {
             </div>
 
             {/* Coupon Management Section */}
-            <div className="border-t border-gray-100 pt-3.5 mt-3.5 space-y-2.5">
+            <div className="border-t border-gray-200 pt-3 mt-3">
               {appliedCoupon ? (
-                <div className="mb-2.5 flex items-center justify-between bg-gradient-to-r from-emerald-50 to-emerald-50/50 border border-emerald-200 rounded-lg p-2.5 shadow-sm">
+                <div className="mb-2 flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-lg p-2">
                   <div className="flex items-center gap-2 min-w-0">
                     <svg className="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -619,7 +616,7 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={() => setShowCouponInput(true)}
-                  className="mb-2.5 w-full flex items-center justify-center gap-2 text-xs font-semibold text-gray-700 py-2 rounded-lg border border-gray-300 bg-gray-50 hover:bg-gray-100 transition-all duration-200 hover:border-gray-400"
+                  className="mb-2 w-full flex items-center justify-center gap-2 text-xs font-semibold text-gray-700 py-2 rounded-lg border border-gray-300 bg-gray-50 hover:bg-gray-100 transition-colors"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
@@ -627,8 +624,8 @@ export default function CheckoutPage() {
                   Add Coupon
                 </button>
               ) : (
-                <div className="mb-2.5 p-3 bg-gradient-to-b from-gray-50 to-white rounded-lg border border-gray-200 shadow-sm">
-                  <div className="flex gap-2 mb-2">
+                <div className="mb-2 p-2.5 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="flex gap-2 mb-1.5">
                     <input
                       type="text"
                       value={couponCode}
@@ -636,8 +633,8 @@ export default function CheckoutPage() {
                         setCouponCode(e.target.value.toUpperCase());
                         setCouponError(null);
                       }}
-                      placeholder="ENTER CODE"
-                      className="flex-1 px-3 py-2 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent focus:bg-white uppercase bg-white transition-all font-medium tracking-widest"
+                      placeholder="Enter code"
+                      className="flex-1 px-2.5 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent uppercase bg-white transition-colors"
                       maxLength={15}
                       disabled={couponLoading}
                     />
@@ -645,7 +642,7 @@ export default function CheckoutPage() {
                       type="button"
                       onClick={handleApplyCoupon}
                       disabled={couponLoading || !couponCode.trim()}
-                      className="px-4 py-2 text-xs font-semibold bg-gray-900 text-white rounded-lg hover:bg-black hover:shadow-md disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center whitespace-nowrap"
+                      className="px-3 py-1.5 text-xs font-semibold bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
                     >
                       {couponLoading ? (
                         <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"></div>
@@ -661,7 +658,7 @@ export default function CheckoutPage() {
                       setCouponCode('');
                       setCouponError(null);
                     }}
-                    className="text-xs text-gray-500 hover:text-gray-800 font-medium transition-colors"
+                    className="text-xs text-gray-600 hover:text-gray-800 transition-colors"
                   >
                     Cancel
                   </button>
@@ -699,10 +696,10 @@ export default function CheckoutPage() {
                 )}
               </div>
             </div>
-            <div className="border-t border-gray-200 pt-3.5 mt-3.5">
-              <div className="flex justify-between items-baseline gap-2">
-                <span className="text-gray-900 font-light text-sm">Total Amount</span>
-                <span className="text-2xl font-semibold text-gray-900 tracking-tight">₹{finalAmount.toFixed(2)}</span>
+            <div className="border-t border-gray-200 pt-3 mt-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-semibold text-gray-900">Total</span>
+                <span className="text-lg font-semibold text-gray-900">₹{finalAmount.toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -710,33 +707,22 @@ export default function CheckoutPage() {
           <button
             type="submit"
             disabled={isProcessing || (!paymentSettings.accept_credit_cards && !paymentSettings.accept_cash)}
-            className={`w-full py-3.5 rounded-xl font-semibold text-sm tracking-wide transition-all duration-200 uppercase ${
+            className={`w-full py-3 rounded-lg font-semibold text-sm transition-colors ${
               isProcessing || (!paymentSettings.accept_credit_cards && !paymentSettings.accept_cash)
-                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                : 'bg-gray-900 text-white hover:bg-black hover:shadow-xl active:scale-95'
+                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                : 'bg-gray-900 text-white hover:bg-gray-800'
             }`}
           >
             {isProcessing ? (
               <div className="flex items-center justify-center gap-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                <span>Processing Order...</span>
+                <span>Processing...</span>
               </div>
             ) : (
-              paymentMethod === 'card' ? '₹ Pay & Place Order' : '✓ Place Order'
+              paymentMethod === 'card' ? 'Pay & Place Order' : '✓ Place Order'
             )}
           </button>
         </form>
-
-        {/* Security & Trust Footer */}
-        <div className="border-t border-gray-100 pt-4 mt-2 text-center space-y-2">
-          <div className="flex items-center justify-center gap-1 text-xs text-gray-500">
-            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 111.414 1.414L7.414 9l3.293 3.293a1 1 0 01-1.414 1.414l-4-4z" clipRule="evenodd" />
-            </svg>
-            <span>Secure &amp; Encrypted</span>
-          </div>
-          <p className="text-xs text-gray-400 font-light">Your payment information is protected</p>
-        </div>
       </main>
     </div>
   );
