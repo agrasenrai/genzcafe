@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { getAllMenuItemsAdmin, getMenuCategories } from '@/lib/supabase/menu';
@@ -442,57 +441,49 @@ export default function MenuItemsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredItems.map((item) => (
             <div key={item.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
-              <div className="relative pt-[60%]">
-                <Image
-                  src={item.image_url || '/placeholder-food.jpg'}
-                  alt={item.name}
-                  fill
-                  className="object-cover"
-                />
-                {!item.available && (
-                  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                    <span className="px-3 py-1 bg-red-600 text-white rounded-full text-xs font-medium">
-                      Not Available
-                    </span>
-                  </div>
-                )}
-                <div className="absolute top-2 left-2">
+              <div className="p-4">
+                <div className="flex justify-between items-start mb-3">
                   <input
                     type="checkbox"
                     checked={selectedItems.includes(item.id)}
                     onChange={() => handleSelectItem(item.id)}
                     className="h-5 w-5 text-black focus:ring-black border-gray-300 rounded"
                   />
-                </div>
-                <div className="absolute top-2 right-2">
-                  {item.is_veg ? (
-                    <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-                      Veg
-                    </span>
-                  ) : (
-                    <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
-                      Non-Veg
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="p-4">
-                <div className="flex justify-between items-start">
-                  <h3 className="font-medium text-gray-900">{item.name}</h3>
                   <div className="text-right">
-                    <div className="font-medium text-gray-900">{formatPrice(item.price)}</div>
-                    {item.original_price && (
-                      <div className="text-sm text-gray-500 line-through">
-                        {formatPrice(item.original_price)}
-                      </div>
+                    {item.is_veg ? (
+                      <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                        Veg
+                      </span>
+                    ) : (
+                      <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+                        Non-Veg
+                      </span>
                     )}
                   </div>
                 </div>
-                <p className="mt-1 text-sm text-gray-600 line-clamp-2">{item.description}</p>
-                <div className="mt-2 text-xs text-gray-500">
-                  Category: {categories.find(c => c.id === item.category_id)?.name || 'Uncategorized'}
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="font-medium text-gray-900">{item.name}</h3>
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    item.available 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {item.available ? 'Available' : 'Unavailable'}
+                  </span>
                 </div>
-                <div className="mt-4 flex justify-between items-center pt-3 border-t border-gray-100">
+                <p className="text-sm text-gray-600 line-clamp-2 mb-3">{item.description}</p>
+                <div className="text-xs text-gray-500 mb-3">
+                  {categories.find(c => c.id === item.category_id)?.name || 'Uncategorized'}
+                </div>
+                <div className="mb-3">
+                  <div className="font-medium text-gray-900">{formatPrice(item.price)}</div>
+                  {item.original_price && (
+                    <div className="text-sm text-gray-500 line-through">
+                      {formatPrice(item.original_price)}
+                    </div>
+                  )}
+                </div>
+                <div className="flex justify-between items-center pt-3 border-t border-gray-100">
                   <Link
                     href={`/admin/menu/${item.id}`}
                     className="text-indigo-600 hover:text-indigo-900 text-sm"
@@ -568,20 +559,8 @@ export default function MenuItemsPage() {
                     />
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="h-10 w-10 flex-shrink-0 mr-3 relative rounded overflow-hidden">
-                        <Image
-                          src={item.image_url || '/placeholder-food.jpg'}
-                          alt={item.name}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">{item.name}</div>
-                        <div className="text-sm text-gray-500 line-clamp-1">{item.description}</div>
-                      </div>
-                    </div>
+                    <div className="text-sm font-medium text-gray-900">{item.name}</div>
+                    <div className="text-sm text-gray-500 line-clamp-1">{item.description}</div>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <div className="text-sm text-gray-900">

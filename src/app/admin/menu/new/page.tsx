@@ -73,24 +73,28 @@ export default function NewMenuItem() {
     
     try {
       // Validate required fields
-      if (!name || !description || !price || !categoryId || !imageFile) {
+      if (!name || !description || !price || !categoryId) {
         throw new Error('Please fill all required fields');
       }
       
-      // Upload image to Supabase Storage
-      const filename = `${Date.now()}-${imageFile.name}`;
-      const { data: imageData, error: imageError } = await supabase.storage
-        .from('menu-images')
-        .upload(filename, imageFile);
+      let imageUrl = null;
       
-      if (imageError) throw new Error(`Error uploading image: ${imageError.message}`);
-      
-      // Get public URL of uploaded image
-      const { data: urlData } = supabase.storage
-        .from('menu-images')
-        .getPublicUrl(filename);
-      
-      const imageUrl = urlData.publicUrl;
+      // Upload image to Supabase Storage only if image is provided
+      if (imageFile) {
+        const filename = `${Date.now()}-${imageFile.name}`;
+        const { data: imageData, error: imageError } = await supabase.storage
+          .from('menu-images')
+          .upload(filename, imageFile);
+        
+        if (imageError) throw new Error(`Error uploading image: ${imageError.message}`);
+        
+        // Get public URL of uploaded image
+        const { data: urlData } = supabase.storage
+          .from('menu-images')
+          .getPublicUrl(filename);
+        
+        imageUrl = urlData.publicUrl;
+      }
       
       // Insert menu item into database
       const { error: insertError } = await supabase
@@ -261,7 +265,7 @@ export default function NewMenuItem() {
             <div className="space-y-6">
               <div>
                 <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">
-                  Item Image*
+                  Item Image (Optional)
                 </label>
                 <div className="flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6 relative">
                   {imagePreview ? (
@@ -300,7 +304,6 @@ export default function NewMenuItem() {
                             accept="image/*"
                             className="sr-only"
                             onChange={handleImageChange}
-                            required={!imagePreview}
                           />
                         </label>
                       </div>

@@ -1,11 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { useCart } from '@/lib/context/CartContext';
 import { useState, useEffect, useRef } from 'react';
 import { getAllMenuItems } from '@/lib/supabase/menu';
-//redploy
 interface MenuItem {
   id: string;
   name: string;
@@ -300,31 +298,25 @@ export default function MenuPage() {
                   }}
                 >
                   <div className="flex gap-3">
-                    <div className="w-24 h-24 relative rounded-xl overflow-hidden flex-shrink-0">
-                      <Image
-                        src={item.image_url || '/placeholder-food.jpg'}
-                        alt={item.name}
-                        fill
-                        sizes="96px"
-                        className="object-cover"
-                      />
-                      {!item.available && (
-                        <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">OUT OF STOCK</span>
-                        </div>
-                      )}
-                      {item.is_veg && item.available && (
-                        <div className="absolute top-2 left-2 bg-white/90 backdrop-blur px-2 py-0.5 rounded-full text-[10px] font-semibold text-green-700 border border-green-100">
-                          Veg
-                        </div>
-                      )}
-                    </div>
-                    
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start gap-2">
-                        <h3 className="font-semibold text-[15px] text-gray-900 leading-snug">
-                          {item.name}
-                        </h3>
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold text-[15px] text-gray-900 leading-snug">
+                              {item.name}
+                            </h3>
+                            {item.is_veg && item.available && (
+                              <div className="inline-block">
+                                <div className="w-4 h-4 border border-green-600 flex items-center justify-center">
+                                  <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                          {!item.available && (
+                            <span className="inline-block text-[10px] font-bold text-white bg-red-600 px-2 py-0.5 rounded-full mb-2">OUT OF STOCK</span>
+                          )}
+                        </div>
                         {item.rating && item.available && (
                           <div className="flex items-center text-xs text-yellow-600 bg-yellow-50 border border-yellow-100 px-2 py-0.5 rounded-full">
                             <span className="font-semibold mr-1">★ {item.rating}</span>
@@ -394,41 +386,33 @@ export default function MenuPage() {
         <div className="fixed inset-0 z-50 flex items-end justify-center">
           <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setIsModalOpen(false)}></div>
           <div className="bg-white w-full max-h-[90vh] overflow-auto z-10 relative rounded-t-xl">
-            <div className="relative">
-              <div className="h-64 relative">
-                <Image
-                  src={selectedItem.image_url || '/placeholder-food.jpg'}
-                  alt={selectedItem.name}
-                  fill
-                  className="object-cover"
-                />
-                {selectedItem.offer && (
-                  <div className="absolute top-4 left-4">
-                    <div className="bg-white text-orange-500 font-medium px-3 py-1 rounded-full text-sm">
+            <div className="p-4">
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <div className="flex items-center">
+                    <h2 className="text-2xl font-bold text-gray-800">{selectedItem.name}</h2>
+                    {selectedItem.is_veg && (
+                      <div className="ml-2">
+                        <div className="w-5 h-5 border border-green-600 flex items-center justify-center">
+                          <div className="w-3 h-3 bg-green-600 rounded-full"></div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  {selectedItem.offer && (
+                    <div className="mt-2 bg-white text-orange-500 font-medium px-3 py-1 rounded-full text-sm inline-block">
                       {selectedItem.offer}
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
                 <button
-                  className="absolute top-4 right-4 bg-white rounded-full p-2"
+                  className="text-gray-400 hover:text-gray-600"
                   onClick={() => setIsModalOpen(false)}
                 >
-                  <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
-              </div>
-            </div>
-            <div className="p-4">
-              <div className="flex items-center">
-                <h2 className="text-2xl font-bold text-gray-800">{selectedItem.name}</h2>
-                {selectedItem.is_veg && (
-                  <div className="ml-2">
-                    <div className="w-5 h-5 border border-green-600 flex items-center justify-center">
-                      <div className="w-3 h-3 bg-green-600 rounded-full"></div>
-                    </div>
-                  </div>
-                )}
               </div>
               
               <div className="flex items-center mt-1">

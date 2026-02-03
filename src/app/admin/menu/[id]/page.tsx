@@ -2,7 +2,6 @@
 
 import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { supabase } from '@/lib/supabase/client';
 import { getMenuItemById } from '@/lib/supabase/menu';
 import { getMenuCategories } from '@/lib/supabase/menu';
@@ -346,18 +345,19 @@ export default function EditMenuItem({ params }: PageProps) {
             
             {/* Image */}
             <div className="md:col-span-2">
-              <h2 className="text-lg font-semibold text-gray-800 mb-2">Item Image</h2>
+              <h2 className="text-lg font-semibold text-gray-800 mb-2">Item Image (Optional)</h2>
               
               <div className="flex flex-col md:flex-row md:items-center gap-4">
                 {imagePreview && (
                   <div className="w-40 h-40 relative rounded-lg overflow-hidden bg-gray-100">
-                    <Image
-                      src={imagePreview}
-                      alt="Menu item preview"
-                      fill
-                      className="object-cover"
-                      sizes="160px"
-                    />
+                    {imagePreview.startsWith('data:') || imagePreview.startsWith('http') ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={imagePreview}
+                        alt="Menu item preview"
+                        className="object-cover w-full h-full"
+                      />
+                    ) : null}
                   </div>
                 )}
                 
