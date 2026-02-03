@@ -250,6 +250,69 @@ export async function getRestaurantInfo() {
 }
 
 /**
+ * Get today's opening and closing time with day name
+ */
+export async function getTodaysHours(): Promise<string> {
+  const settings = await getRestaurantSettings();
+  if (!settings || !settings.business_hours) return 'Today: 11:00 AM - 10:00 PM';
+  
+  try {
+    const hours = settings.business_hours;
+    const currentDay = getCurrentDayName();
+    const dayNames: { [key: string]: string } = {
+      'sunday': 'Sunday',
+      'monday': 'Monday',
+      'tuesday': 'Tuesday',
+      'wednesday': 'Wednesday',
+      'thursday': 'Thursday',
+      'friday': 'Friday',
+      'saturday': 'Saturday'
+    };
+    
+    // Handle complex format: "Mon, Tue, Wed: 9:00 AM - 5:00 PM; Thu, Fri: 10:00 AM - 6:00 PM"
+    const scheduleSegments = hours.split(';').map(s => s.trim());
+    
+    for (const segment of scheduleSegments) {
+      const colonIndex = segment.indexOf(':');
+      if (colonIndex === -1) continue;
+      
+      const daysStr = segment.substring(0, colonIndex).trim();
+      const timeStr = segment.substring(colonIndex + 1).trim();
+      
+      // Parse days (Mon, Tue, Wed, etc.)
+      const dayAbbreviations = daysStr.split(',').map(d => d.trim().toLowerCase());
+      const dayMap: { [key: string]: string } = {
+        'mon': 'monday', 'tue': 'tuesday', 'wed': 'wednesday', 'thu': 'thursday',
+        'fri': 'friday', 'sat': 'saturday', 'sun': 'sunday',
+        'monday': 'monday', 'tuesday': 'tuesday', 'wednesday': 'wednesday', 
+        'thursday': 'thursday', 'friday': 'friday', 'saturday': 'saturday', 'sunday': 'sunday'
+      };
+      
+      const applicableDays = dayAbbreviations
+        .map(abbr => dayMap[abbr])
+        .filter(day => day);
+      
+      // Check if current day is in this segment
+      if (!applicableDays.includes(currentDay)) continue;
+      
+      // Return with day name and time
+      return `${dayNames[currentDay]}: ${timeStr}`;
+    }
+    
+    // If no specific schedule found, return generic hours with day
+    const simpleMatch = hours.match(/(\d{1,2}:\d{2}\s*(?:AM|PM))\s*-\s*(\d{1,2}:\d{2}\s*(?:AM|PM))/i);
+    if (simpleMatch) {
+      return `${dayNames[currentDay]}: ${simpleMatch[1]} - ${simpleMatch[2]}`;
+    }
+    
+    return `${dayNames[currentDay]}: ${hours}`;
+  } catch (error) {
+    console.error('Error parsing business hours:', error);
+    return settings?.business_hours || 'Today: 11:00 AM - 10:00 PM';
+  }
+}
+
+/**
  * Get delivery points from restaurant settings
  */
 export function getDeliveryPointsFromSettings(settings: RestaurantSettings | null): Array<{name: string; address: string; phone?: string}> {

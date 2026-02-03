@@ -198,21 +198,21 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { isRestaurantOpen, getRestaurantInfo } from '@/lib/supabase/settings';
+import { isRestaurantOpen, getRestaurantInfo, getTodaysHours } from '@/lib/supabase/settings';
 
 export default function Home() {
   const router = useRouter();
   const [restaurantInfo, setRestaurantInfo] = useState({
-    openingHours: 'Opens: 11:00 AM - 10:00 PM'
+    openingHours: '11:00 AM - 10:00 PM'
   });
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function checkStatus() {
       try {
-        const [open, info] = await Promise.all([
+        const [open, todaysHours] = await Promise.all([
           isRestaurantOpen(),
-          getRestaurantInfo()
+          getTodaysHours()
         ]);
         
         if (!open) {
@@ -221,7 +221,7 @@ export default function Home() {
         }
         
         setRestaurantInfo({
-          openingHours: `Opens: ${info.openingHours}`
+          openingHours: todaysHours
         });
       } catch (error) {
         console.error('Error checking restaurant status:', error);
