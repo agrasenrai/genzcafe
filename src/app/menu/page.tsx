@@ -503,7 +503,7 @@ export default function MenuPage() {
       {/* Cart floating pill - updated to be more stretched and fully clickable */}
       {cartItems.length > 0 && (
         <Link href="/cart">
-          <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-[95%] max-w-md mx-auto bg-yellow-50 text-yellow-900 py-3 px-6 rounded-full flex justify-between items-center shadow-lg z-20 cursor-pointer hover:bg-white transition-all border border-gray-900">
+          <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-[95%] max-w-md mx-auto bg-yellow-50 text-yellow-900 py-3 px-6 rounded-full flex justify-between items-center shadow-2xl hover:shadow-[0_10px_25px_rgba(0,0,0,0.25)] z-20 cursor-pointer hover:bg-white transition-all border-2 border-gray-900">
             <div className="flex items-center">
               <div className="bg-yellow-100 text-yellow-900 rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium mr-2">
                 {cartItems.reduce((total, item) => total + item.quantity, 0)}

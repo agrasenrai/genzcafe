@@ -83,7 +83,7 @@ export default function CheckoutConfirmation() {
           <p className="text-sm text-gray-600 mb-4">We couldn't find your order details.</p>
           <Link
             href="/menu"
-            className="inline-block bg-yellow-50 text-yellow-900 px-6 py-3 rounded-lg font-semibold text-sm border border-gray-900 hover:bg-white transition-colors"
+            className="inline-block bg-yellow-50 text-yellow-900 px-6 py-3 rounded-lg font-semibold text-sm border border-gray-900 hover:bg-white transition-all shadow-md hover:shadow-lg active:shadow-sm"
           >
             Browse Menu
           </Link>
@@ -123,7 +123,7 @@ export default function CheckoutConfirmation() {
               </p>
               <Link
                 href="/checkout"
-                className="inline-block bg-yellow-50 text-yellow-900 px-6 py-3 rounded-lg font-medium border border-gray-900 hover:bg-white transition-colors"
+                className="inline-block bg-yellow-50 text-yellow-900 px-6 py-3 rounded-lg font-medium border border-gray-900 hover:bg-white transition-all shadow-md hover:shadow-lg active:shadow-sm"
               >
                 Try Again
               </Link>
@@ -281,7 +281,7 @@ export default function CheckoutConfirmation() {
         <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl bg-[#FFFDF7] border-t border-gray-200 p-4">
           <Link
             href={`/track?otp=${order.otp}`}
-            className="block w-full bg-yellow-50 text-yellow-900 text-center py-3 rounded-lg font-medium border border-gray-900 hover:bg-white transition-colors"
+            className="block w-full bg-yellow-50 text-yellow-900 text-center py-3 rounded-lg font-medium border-2 border-gray-900 hover:bg-white transition-all shadow-lg hover:shadow-xl active:shadow-md"
           >
             Track Order
           </Link>

@@ -443,7 +443,7 @@ export default function CheckoutPage() {
                     setScheduledTime('');
                     setTimeError(null);
                   }}
-                  className={`flex-1 py-2 px-4 rounded-lg border-2 transition-colors ${
+                  className={`flex-1 py-2 px-4 rounded-lg border-2 transition-all shadow-md hover:shadow-lg active:shadow-sm ${
                     scheduledTime === ''
                       ? 'border-black bg-black text-white'
                       : 'border-gray-200 text-gray-700 hover:border-gray-300'
@@ -462,7 +462,7 @@ export default function CheckoutPage() {
                       setScheduledTime(`${hours}:${minutes}`);
                     }
                   }}
-                  className={`flex-1 py-2 px-4 rounded-lg border-2 transition-colors ${
+                  className={`flex-1 py-2 px-4 rounded-lg border-2 transition-all shadow-md hover:shadow-lg active:shadow-sm ${
                     scheduledTime !== ''
                       ? 'border-black bg-black text-white'
                       : 'border-gray-200 text-gray-700 hover:border-gray-300'
@@ -516,7 +516,7 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={() => setPaymentMethod('card')}
-                  className={`flex-1 py-2 rounded-full border-2 ${
+                  className={`flex-1 py-2 rounded-full border-2 transition-all shadow-md hover:shadow-lg active:shadow-sm ${
                     paymentMethod === 'card'
                       ? 'border-black bg-black text-white'
                       : 'border-gray-200 text-gray-700'
@@ -529,7 +529,7 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={() => setPaymentMethod('cash')}
-                  className={`flex-1 py-2 rounded-full border-2 ${
+                  className={`flex-1 py-2 rounded-full border-2 transition-all shadow-md hover:shadow-lg active:shadow-sm ${
                     paymentMethod === 'cash'
                       ? 'border-black bg-black text-white'
                       : 'border-gray-200 text-gray-700'
@@ -607,7 +607,7 @@ export default function CheckoutPage() {
                   <button
                     type="button"
                     onClick={handleRemoveCoupon}
-                    className="text-red-600 hover:text-red-700 text-xs font-semibold flex-shrink-0 transition-colors duration-200"
+                    className="text-red-600 hover:text-red-700 text-xs font-semibold flex-shrink-0 transition-all shadow-sm hover:shadow-md active:shadow-none"
                   >
                     Remove
                   </button>
@@ -616,7 +616,7 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={() => setShowCouponInput(true)}
-                  className="mb-2 w-full flex items-center justify-center gap-2 text-xs font-semibold text-yellow-600 py-1 rounded-lg hover:text-yellow-700 hover:bg-yellow-50 transition-all"
+                  className="mb-2 w-full flex items-center justify-center gap-2 text-xs font-semibold text-yellow-600 py-1 rounded-lg hover:text-yellow-700 hover:bg-yellow-50 transition-all shadow-sm hover:shadow-md active:shadow-none"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
@@ -642,7 +642,7 @@ export default function CheckoutPage() {
                       type="button"
                       onClick={handleApplyCoupon}
                       disabled={couponLoading || !couponCode.trim()}
-                      className="px-3 py-1.5 text-xs font-semibold bg-yellow-50 text-yellow-900 border border-gray-900 rounded-lg hover:bg-white disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+                      className="px-3 py-1.5 text-xs font-semibold bg-yellow-50 text-yellow-900 border border-gray-900 rounded-lg hover:bg-white disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg active:shadow-sm flex items-center justify-center"
                     >
                       {couponLoading ? (
                         <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"></div>
@@ -707,10 +707,10 @@ export default function CheckoutPage() {
           <button
             type="submit"
             disabled={isProcessing || (!paymentSettings.accept_credit_cards && !paymentSettings.accept_cash)}
-            className={`w-full py-3 rounded-lg font-semibold text-sm transition-colors ${
+            className={`w-full py-3 rounded-lg font-semibold text-sm transition-all ${
               isProcessing || (!paymentSettings.accept_credit_cards && !paymentSettings.accept_cash)
-                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                : 'bg-yellow-50 text-yellow-900 border border-gray-900 hover:bg-white'
+                ? 'bg-gray-300 text-gray-600 cursor-not-allowed shadow-md'
+                : 'bg-yellow-50 text-yellow-900 border-2 border-gray-900 hover:bg-white shadow-lg hover:shadow-xl active:shadow-md'
             }`}
           >
             {isProcessing ? (
@@ -788,7 +788,7 @@ function CouponInput({
           <button
             type="button"
             onClick={handleRemoveCoupon}
-            className="text-red-600 text-sm font-medium hover:text-red-700"
+            className="text-red-600 text-sm font-medium hover:text-red-700 transition-all shadow-sm hover:shadow-md active:shadow-none"
           >
             Remove
           </button>
@@ -796,7 +796,7 @@ function CouponInput({
           <button
             type="button"
             onClick={() => setShowInput(!showInput)}
-            className="text-yellow-600 text-sm font-medium hover:text-yellow-700"
+            className="text-yellow-600 text-sm font-medium hover:text-yellow-700 transition-all shadow-sm hover:shadow-md active:shadow-none"
           >
             {showInput ? 'Cancel' : 'Add Code'}
           </button>
@@ -838,7 +838,7 @@ function CouponInput({
               type="button"
               onClick={handleApplyCoupon}
               disabled={couponLoading || !couponCode.trim()}
-              className="px-4 py-2 bg-yellow-600 text-white rounded-lg font-medium hover:bg-yellow-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center min-w-[80px]"
+              className="px-4 py-2 bg-yellow-600 text-white rounded-lg font-medium hover:bg-yellow-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center min-w-[80px] transition-all shadow-md hover:shadow-lg active:shadow-sm"
             >
               {couponLoading ? (
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
