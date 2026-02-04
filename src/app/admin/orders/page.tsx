@@ -7,6 +7,9 @@ import { supabase } from '@/lib/supabase/client';
 import { updateOrderStatus } from '@/lib/supabase/orders';
 import { formatPrice, formatDate, formatTime } from '@/lib/utils/helpers';
 import { getOrderFeedback, getItemsFeedback } from '@/lib/supabase/feedback';
+import { printMultipleKOTs } from '@/lib/utils/kotGenerator';
+import { printBill as printBillDocument } from '@/lib/utils/billGenerator';
+import { getOrderForKOT, formatOrderForKOT, formatOrderForBill } from '@/lib/supabase/kotService';
 
 interface OrderItem {
   id: string;
@@ -63,6 +66,8 @@ export default function OrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<OrderWithFeedback | null>(null);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [printMessage, setPrintMessage] = useState<string | null>(null);
+  const printMessageTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   // Notification state
   const prevOrderIdsRef = useRef<Set<string>>(new Set());
   const [showNewOrderAlert, setShowNewOrderAlert] = useState(false);
@@ -219,6 +224,22 @@ export default function OrdersPage() {
       
       if (selectedOrder && selectedOrder.id === orderId) {
         setSelectedOrder({ ...selectedOrder, status: newStatus });
+      }
+
+      // Auto-print KOT when order is confirmed
+      if (newStatus === 'confirmed') {
+        try {
+          const order = await getOrderForKOT(orderId);
+          const kotData = formatOrderForKOT(order);
+          
+          // Print 2 KOTs automatically
+          setTimeout(() => {
+            printMultipleKOTs(kotData, 2);
+          }, 500);
+        } catch (kotError) {
+          console.error('Error printing KOT:', kotError);
+          // Don't fail the status update if KOT printing fails
+        }
       }
     } catch (err: any) {
       console.error('Error updating order status:', err);
@@ -562,7 +583,27 @@ export default function OrdersPage() {
           <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="px-6 py-4 border-b">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium text-gray-900">Order #{selectedOrder.otp}</h3>
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900">Order #{selectedOrder.otp}</h3>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className={`px-3 py-1 text-sm font-semibold rounded-full ${
+                      selectedOrder.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                      selectedOrder.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                      selectedOrder.status === 'confirmed' ? 'bg-blue-100 text-blue-800' :
+                      'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {selectedOrder.status.charAt(0).toUpperCase() + selectedOrder.status.slice(1).replace('_', ' ')}
+                    </span>
+                    {selectedOrder.status === 'confirmed' && (
+                      <span className="px-3 py-1 text-sm font-semibold rounded-full bg-purple-100 text-purple-800 flex items-center gap-1">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        KOTs Printed
+                      </span>
+                    )}
+                  </div>
+                </div>
                 <button onClick={() => setModalOpen(false)} className="text-gray-400 hover:text-gray-500">
                   <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -734,7 +775,67 @@ export default function OrdersPage() {
               )}
             </div>
 
-            <div className="px-6 py-4 bg-gray-50 flex justify-end">
+            <div className="px-6 py-4 bg-gray-50 flex justify-between gap-2">
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    try {
+                      const kotData = formatOrderForKOT(selectedOrder);
+                      printMultipleKOTs(kotData, 2);
+                      setPrintMessage('KOT printing initiated - 2 copies');
+                      if (printMessageTimeoutRef.current) clearTimeout(printMessageTimeoutRef.current);
+                      printMessageTimeoutRef.current = setTimeout(() => setPrintMessage(null), 3000);
+                    } catch (error) {
+                      console.error('Error printing KOT:', error);
+                      setPrintMessage('Failed to print KOT');
+                      if (printMessageTimeoutRef.current) clearTimeout(printMessageTimeoutRef.current);
+                      printMessageTimeoutRef.current = setTimeout(() => setPrintMessage(null), 3000);
+                    }
+                  }}
+                  className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 font-medium flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2z" />
+                  </svg>
+                  Print KOT (x2)
+                </button>
+                <button
+                  onClick={() => {
+                    try {
+                      const billData = formatOrderForBill(selectedOrder);
+                      printBillDocument(billData);
+                      setPrintMessage('Bill printing initiated');
+                      if (printMessageTimeoutRef.current) clearTimeout(printMessageTimeoutRef.current);
+                      printMessageTimeoutRef.current = setTimeout(() => setPrintMessage(null), 3000);
+                    } catch (error) {
+                      console.error('Error printing Bill:', error);
+                      setPrintMessage('Failed to print Bill');
+                      if (printMessageTimeoutRef.current) clearTimeout(printMessageTimeoutRef.current);
+                      printMessageTimeoutRef.current = setTimeout(() => setPrintMessage(null), 3000);
+                    }
+                  }}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 font-medium flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2z" />
+                  </svg>
+                  Print Bill
+                </button>
+              </div>
+              {printMessage && (
+                <div className={`px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2 ${
+                  printMessage.includes('Failed') 
+                    ? 'bg-red-100 text-red-700' 
+                    : 'bg-green-100 text-green-700'
+                }`}>
+                  {!printMessage.includes('Failed') && (
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                    </svg>
+                  )}
+                  {printMessage}
+                </div>
+              )}
               <button
                 onClick={() => setModalOpen(false)}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
