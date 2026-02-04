@@ -338,15 +338,10 @@ export function generateKOTHTML(data: KOTData): string {
           text-align: center;
           display: block;
           padding: 1mm 5mm;
-          page-break-after: always;
-          margin-bottom: 3mm;
-          max-width: 80mm;
-          margin-left: 5mm;
-          margin-right: 5mm;
-        }
-        
-        .kot-container:last-child {
           page-break-after: auto;
+          max-width: 80mm;
+          margin-left: auto;
+          margin-right: auto;
         }
         
         .header-title {
@@ -464,7 +459,6 @@ export function generateKOTHTML(data: KOTData): string {
       </style>
     </head>
     <body>
-      ${kotContent}
       ${kotContent}
     </body>
     </html>
