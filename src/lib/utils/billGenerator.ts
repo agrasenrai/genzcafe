@@ -45,10 +45,22 @@ export function generateBillHTML(data: BillData): string {
           box-sizing: border-box;
         }
         
+        @page {
+          size: 80mm auto;
+          margin: 0;
+        }
+        
+        html, body {
+          margin: 0 !important;
+          padding: 0 !important;
+          width: 80mm;
+          height: auto;
+        }
+        
         body {
           font-family: 'Courier New', Courier, monospace;
           width: 80mm;
-          padding: 5mm;
+          padding: 0;
           background: white;
           font-weight: bold;
           color: #000;
@@ -57,15 +69,16 @@ export function generateBillHTML(data: BillData): string {
         }
         
         .bill-container {
-          width: 100%;
-          border: 1px solid #000;
-          padding: 8mm;
+          width: 80mm;
+          border: 2px solid #000;
+          padding: 5mm;
+          page-break-after: avoid;
         }
         
         .header {
           text-align: center;
           font-weight: 900;
-          font-size: 14px;
+          font-size: 18px;
           margin-bottom: 3mm;
           padding-bottom: 2mm;
           border-bottom: 2px solid #000;
@@ -73,14 +86,14 @@ export function generateBillHTML(data: BillData): string {
         }
         
         .store-name {
-          font-size: 12px;
+          font-size: 16px;
           margin-bottom: 1mm;
           font-weight: 900;
           color: #000;
         }
         
         .bill-info {
-          font-size: 10px;
+          font-size: 12px;
           margin-bottom: 5mm;
           text-align: left;
           font-weight: bold;
@@ -108,7 +121,7 @@ export function generateBillHTML(data: BillData): string {
         .table-header {
           display: flex;
           font-weight: 900;
-          font-size: 10px;
+          font-size: 13px;
           padding: 2mm 0;
           border-bottom: 2px solid #000;
           color: #000;
@@ -130,7 +143,7 @@ export function generateBillHTML(data: BillData): string {
         
         .item-row {
           display: flex;
-          font-size: 10px;
+          font-size: 12px;
           padding: 1.5mm 0;
           border-bottom: 1px dotted #000;
           align-items: flex-start;
@@ -162,7 +175,7 @@ export function generateBillHTML(data: BillData): string {
         .totals-section {
           margin-top: 3mm;
           margin-bottom: 5mm;
-          font-size: 10px;
+          font-size: 12px;
           font-weight: bold;
           color: #000;
         }
@@ -192,7 +205,7 @@ export function generateBillHTML(data: BillData): string {
           display: flex;
           justify-content: space-between;
           padding: 2mm 0;
-          font-size: 12px;
+          font-size: 14px;
           font-weight: 900;
           border-top: 2px solid #000;
           border-bottom: 2px solid #000;
@@ -208,7 +221,7 @@ export function generateBillHTML(data: BillData): string {
         }
         
         .payment-info {
-          font-size: 10px;
+          font-size: 12px;
           text-align: center;
           margin-top: 3mm;
           padding: 2mm 0;
@@ -216,7 +229,7 @@ export function generateBillHTML(data: BillData): string {
         }
         
         .customer-info {
-          font-size: 9px;
+          font-size: 11px;
           margin-top: 2mm;
           text-align: left;
           background: #f9f9f9;
@@ -224,7 +237,7 @@ export function generateBillHTML(data: BillData): string {
         }
         
         .footer {
-          font-size: 9px;
+          font-size: 11px;
           text-align: center;
           margin-top: 3mm;
           padding-top: 2mm;
@@ -331,9 +344,6 @@ export function generateBillHTML(data: BillData): string {
           <div class="thank-you">
             Thank You! 🙏
           </div>
-          <div style="margin-top: 2mm;">
-            Order ID: ${data.orderId}
-          </div>
           <div style="margin-top: 1mm;">
             Visit Us Again!
           </div>
@@ -359,6 +369,32 @@ export function printBill(data: BillData): void {
     
     printWindow.onload = () => {
       printWindow.print();
+    };
+  } else {
+    alert('Please allow popups to print bill');
+  }
+}
+
+/**
+ * Print Bill automatically (without user interaction)
+ * Triggers print and closes window after printing
+ */
+export function printBillAutomatically(data: BillData): void {
+  const billHTML = generateBillHTML(data);
+  const printWindow = window.open('', '_blank', 'width=400,height=600');
+  
+  if (printWindow) {
+    printWindow.document.write(billHTML);
+    printWindow.document.close();
+    
+    printWindow.onload = () => {
+      setTimeout(() => {
+        printWindow.print();
+        // Close window after printing
+        setTimeout(() => {
+          printWindow.close();
+        }, 1000);
+      }, 300);
     };
   } else {
     alert('Please allow popups to print bill');

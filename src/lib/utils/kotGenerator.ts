@@ -517,9 +517,9 @@ export function printMultipleKOTs(data: KOTData, copies: number = 2): void {
           // Close window after both prints
           setTimeout(() => {
             printWindow.close();
-          }, 1500);
-        }, 1500);
-      }, 300);
+          }, 100);
+        }, 100);
+      }, 20);
     };
   } else {
     alert('Please allow popups to print KOT');

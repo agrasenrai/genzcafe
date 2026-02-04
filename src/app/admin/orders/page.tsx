@@ -8,7 +8,7 @@ import { updateOrderStatus } from '@/lib/supabase/orders';
 import { formatPrice, formatDate, formatTime } from '@/lib/utils/helpers';
 import { getOrderFeedback, getItemsFeedback } from '@/lib/supabase/feedback';
 import { printMultipleKOTs } from '@/lib/utils/kotGenerator';
-import { printBill as printBillDocument } from '@/lib/utils/billGenerator';
+import { printBill as printBillDocument, printBillAutomatically } from '@/lib/utils/billGenerator';
 import { getOrderForKOT, formatOrderForKOT, formatOrderForBill } from '@/lib/supabase/kotService';
 
 interface OrderItem {
@@ -470,6 +470,9 @@ export default function OrdersPage() {
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Pickup Time
                 </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -567,6 +570,26 @@ export default function OrdersPage() {
                         </button>
                       ))}
                     </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        try {
+                          const billData = formatOrderForBill(order);
+                          printBillAutomatically(billData);
+                        } catch (error) {
+                          console.error('Error printing bill:', error);
+                          alert('Failed to print bill');
+                        }
+                      }}
+                      className="px-3 py-1.5 bg-green-500 text-white rounded-md hover:bg-green-600 font-medium flex items-center gap-1.5 text-sm"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      Bill
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -781,13 +804,20 @@ export default function OrdersPage() {
                   onClick={() => {
                     try {
                       const kotData = formatOrderForKOT(selectedOrder);
+                      const billData = formatOrderForBill(selectedOrder);
                       printMultipleKOTs(kotData, 2);
                       setPrintMessage('KOT printing initiated - 2 copies');
                       if (printMessageTimeoutRef.current) clearTimeout(printMessageTimeoutRef.current);
-                      printMessageTimeoutRef.current = setTimeout(() => setPrintMessage(null), 3000);
+                      
+                      // After KOTs are printed, automatically print bill as well
+                      printMessageTimeoutRef.current = setTimeout(() => {
+                        printBillAutomatically(billData);
+                        setPrintMessage('Bill printing automatically');
+                        printMessageTimeoutRef.current = setTimeout(() => setPrintMessage(null), 3000);
+                      }, 3500); // Wait for 2 KOTs to complete printing
                     } catch (error) {
-                      console.error('Error printing KOT:', error);
-                      setPrintMessage('Failed to print KOT');
+                      console.error('Error printing KOT/Bill:', error);
+                      setPrintMessage('Failed to print KOT/Bill');
                       if (printMessageTimeoutRef.current) clearTimeout(printMessageTimeoutRef.current);
                       printMessageTimeoutRef.current = setTimeout(() => setPrintMessage(null), 3000);
                     }

@@ -173,12 +173,15 @@ export default function MenuPage() {
             {/* Pure Veg toggle - green veg icon (Indian veg symbol: circle with dot) */}
             <button
               onClick={() => setIsVegOnly(!isVegOnly)}
-              className={`p-1.5 rounded-full transition-colors ${isVegOnly ? 'bg-green-100' : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600'}`}
+              className={`p-1.5 transition-colors flex items-center gap-1`}
               title={isVegOnly ? 'Pure Veg Only (click to show all)' : 'Show Pure Veg only'}
               aria-label={isVegOnly ? 'Pure Veg filter active' : 'Pure Veg filter'}
             >
-              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${isVegOnly ? 'border-green-600 bg-green-50' : 'border-gray-300'}`}>
-                <div className={`w-2 h-2 rounded-full ${isVegOnly ? 'bg-green-600' : 'bg-gray-300'}`} />
+              <span className={`text-xs font-semibold ${isVegOnly ? 'text-green-600' : 'text-gray-300'}`}>
+                Veg
+              </span>
+              <div className={`w-4 h-4 border flex items-center justify-center ${isVegOnly ? 'border-green-600' : 'border-gray-300'}`}>
+                <div className={`w-2 h-2 rounded-full ${isVegOnly ? 'bg-green-600' : 'bg-gray-300'}`}></div>
               </div>
             </button>
             {/* Search icon / Close icon when search open */}
