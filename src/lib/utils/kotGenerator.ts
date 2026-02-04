@@ -34,6 +34,43 @@ export function generateKOTHTML(data: KOTData): string {
     hour12: true
   });
 
+  // Generate KOT content
+  const kotContent = `
+    <div class="kot-container">
+      <div class="header-title">KOT</div>
+      <div class="restaurant-name">GEN Z BETA CAFE</div>
+      
+      <div class="order-details">
+        <div class="detail-row">
+          <span class="detail-label">Kot No:-</span>
+          <span class="detail-value">${data.orderNumber}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Name:-</span>
+          <span class="detail-value">${data.customerName}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Date:-</span>
+          <span class="detail-value">${printedDate}</span>
+        </div>
+      </div>
+      
+      <div class="items-header">
+        <span class="item-name-header">Item</span>
+        <span class="item-qty-header">QTY</span>
+      </div>
+      
+      <div class="items-list">
+        ${data.items.map(item => `
+          <div class="item-row">
+            <div class="item-name">${item.name}</div>
+            <div class="item-qty">${item.quantity}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
   const html = `
     <!DOCTYPE html>
     <html>
@@ -42,154 +79,150 @@ export function generateKOTHTML(data: KOTData): string {
       <title>KOT - Order ${data.orderNumber}</title>
       <style>
         * {
-          margin: 0;
-          padding: 0;
+          margin: 0 !important;
+          padding: 0 !important;
           box-sizing: border-box;
+        }
+        
+        @page {
+          size: 80mm auto;
+          margin: 0mm;
+        }
+        
+        html {
+          margin: 0 !important;
+          padding: 0 !important;
+          height: auto !important;
         }
         
         body {
           font-family: 'Courier New', Courier, monospace;
-          width: 80mm;
-          padding: 2mm;
           background: white;
+          margin: 0 !important;
+          padding: 0 !important;
+          width: 80mm;
+          height: auto !important;
+          min-height: auto !important;
+          font-weight: bold;
+          color: #000;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
         }
         
         .kot-container {
           width: 100%;
           text-align: center;
+          display: block;
+          padding: 2mm 3mm;
+          page-break-after: always;
+        }
+        
+        .kot-container:last-child {
+          page-break-after: auto;
         }
         
         .header-title {
           text-align: center;
-          font-weight: bold;
-          font-size: 16px;
-          margin-bottom: 2mm;
+          font-weight: 900;
+          font-size: 20px;
+          margin-bottom: 1mm !important;
           letter-spacing: 2px;
+          line-height: 1.2;
+          color: #000;
         }
         
         .restaurant-name {
           text-align: center;
-          font-weight: bold;
-          font-size: 14px;
-          margin-bottom: 4mm;
+          font-weight: 900;
+          font-size: 13px;
+          margin-bottom: 2mm !important;
+          line-height: 1.2;
+          color: #000;
         }
         
         .order-details {
-          font-size: 11px;
-          margin-bottom: 4mm;
+          font-size: 12px;
+          margin-bottom: 2mm !important;
           text-align: left;
+          line-height: 1.3;
+          font-weight: bold;
+          color: #000;
         }
         
         .detail-row {
           display: flex;
-          margin-bottom: 1mm;
+          margin-bottom: 0.5mm !important;
         }
         
         .detail-label {
-          font-weight: bold;
+          font-weight: 900;
           width: 40mm;
+          color: #000;
         }
         
         .detail-value {
           flex: 1;
+          font-weight: bold;
+          color: #000;
         }
         
         .items-header {
-          font-size: 11px;
-          font-weight: bold;
-          margin-top: 4mm;
-          margin-bottom: 2mm;
-          padding-bottom: 2mm;
-          border-bottom: 1px dashed #000;
+          font-size: 12px;
+          font-weight: 900;
+          margin-top: 2mm !important;
+          margin-bottom: 1mm !important;
+          padding-bottom: 1mm !important;
+          border-bottom: 2px solid #000;
           display: flex;
           justify-content: space-between;
+          line-height: 1.2;
+          color: #000;
         }
         
         .item-name-header {
           flex: 1;
+          font-weight: 900;
         }
         
         .item-qty-header {
           width: 25mm;
           text-align: right;
+          font-weight: 900;
         }
         
         .items-list {
-          margin-bottom: 4mm;
+          margin-bottom: 0mm !important;
         }
         
         .item-row {
-          font-size: 11px;
-          margin-bottom: 1.5mm;
+          font-size: 12px;
+          margin-bottom: 0.8mm !important;
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
+          line-height: 1.3;
+          font-weight: bold;
+          color: #000;
         }
         
         .item-name {
           flex: 1;
           word-wrap: break-word;
+          font-weight: bold;
+          color: #000;
         }
         
         .item-qty {
           width: 25mm;
           text-align: right;
-          font-weight: bold;
-        }
-        
-        .footer {
-          margin-top: 4mm;
-          padding-top: 2mm;
-          border-top: 1px dashed #000;
-          font-size: 10px;
-          text-align: center;
-        }
-        
-        @media print {
-          body {
-            margin: 0;
-            padding: 0;
-          }
+          font-weight: 900;
+          color: #000;
         }
       </style>
     </head>
     <body>
-      <div class="kot-container">
-        <div class="header-title">KOT</div>
-        <div class="restaurant-name">GEN Z BETA CAFE</div>
-        
-        <div class="order-details">
-          <div class="detail-row">
-            <span class="detail-label">Kot No:-</span>
-            <span class="detail-value">${data.orderNumber}</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Name:-</span>
-            <span class="detail-value">${data.customerName}</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Date:-</span>
-            <span class="detail-value">${printedDate}</span>
-          </div>
-        </div>
-        
-        <div class="items-header">
-          <span class="item-name-header">Item</span>
-          <span class="item-qty-header">QTY</span>
-        </div>
-        
-        <div class="items-list">
-          ${data.items.map(item => `
-            <div class="item-row">
-              <div class="item-name">${item.name}</div>
-              <div class="item-qty">${item.quantity}</div>
-            </div>
-          `).join('')}
-        </div>
-        
-        <div class="footer">
-        </div>
-      </div>
+      ${kotContent}
+      ${kotContent}
     </body>
     </html>
   `;
@@ -208,9 +241,15 @@ export function printKOT(data: KOTData): void {
     printWindow.document.write(kotHTML);
     printWindow.document.close();
     
-    // Wait for content to load then print
+    // Wait for content to load then print and close
     printWindow.onload = () => {
-      printWindow.print();
+      setTimeout(() => {
+        printWindow.print();
+        // Close window after printing
+        setTimeout(() => {
+          printWindow.close();
+        }, 1000);
+      }, 300);
     };
   } else {
     alert('Please allow popups to print KOT');
@@ -219,12 +258,27 @@ export function printKOT(data: KOTData): void {
 
 /**
  * Print multiple KOTs (for kitchen multiple copies)
+ * Default 2 copies, prints to GBILL printer automatically
  */
 export function printMultipleKOTs(data: KOTData, copies: number = 2): void {
-  for (let i = 0; i < copies; i++) {
-    setTimeout(() => {
-      printKOT(data);
-    }, i * 1000); // 1 second delay between each print
+  const kotHTML = generateKOTHTML(data);
+  const printWindow = window.open('', '_blank', 'width=400,height=600');
+  
+  if (printWindow) {
+    printWindow.document.write(kotHTML);
+    printWindow.document.close();
+    
+    printWindow.onload = () => {
+      setTimeout(() => {
+        printWindow.print();
+        // Close window after printing
+        setTimeout(() => {
+          printWindow.close();
+        }, 500);
+      }, 200);
+    };
+  } else {
+    alert('Please allow popups to print KOT');
   }
 }
 

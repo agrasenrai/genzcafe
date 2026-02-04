@@ -50,6 +50,10 @@ export function generateBillHTML(data: BillData): string {
           width: 80mm;
           padding: 5mm;
           background: white;
+          font-weight: bold;
+          color: #000;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
         }
         
         .bill-container {
@@ -60,22 +64,27 @@ export function generateBillHTML(data: BillData): string {
         
         .header {
           text-align: center;
-          font-weight: bold;
+          font-weight: 900;
           font-size: 14px;
           margin-bottom: 3mm;
           padding-bottom: 2mm;
-          border-bottom: 1px solid #000;
+          border-bottom: 2px solid #000;
+          color: #000;
         }
         
         .store-name {
           font-size: 12px;
           margin-bottom: 1mm;
+          font-weight: 900;
+          color: #000;
         }
         
         .bill-info {
           font-size: 10px;
           margin-bottom: 5mm;
           text-align: left;
+          font-weight: bold;
+          color: #000;
         }
         
         .info-row {
@@ -85,7 +94,8 @@ export function generateBillHTML(data: BillData): string {
         }
         
         .info-label {
-          font-weight: bold;
+          font-weight: 900;
+          color: #000;
         }
         
         .items-table {
@@ -97,10 +107,11 @@ export function generateBillHTML(data: BillData): string {
         
         .table-header {
           display: flex;
-          font-weight: bold;
+          font-weight: 900;
           font-size: 10px;
           padding: 2mm 0;
-          border-bottom: 1px dashed #000;
+          border-bottom: 2px solid #000;
+          color: #000;
         }
         
         .col-item {
@@ -121,48 +132,60 @@ export function generateBillHTML(data: BillData): string {
           display: flex;
           font-size: 10px;
           padding: 1.5mm 0;
-          border-bottom: 1px dotted #ddd;
+          border-bottom: 1px dotted #000;
           align-items: flex-start;
+          font-weight: bold;
+          color: #000;
         }
         
         .item-name {
           flex: 1;
           word-wrap: break-word;
-          font-weight: normal;
+          font-weight: bold;
+          color: #000;
         }
         
         .item-qty {
           width: 20mm;
           text-align: center;
+          font-weight: bold;
+          color: #000;
         }
         
         .item-total {
           width: 25mm;
           text-align: right;
-          font-weight: bold;
+          font-weight: 900;
+          color: #000;
         }
         
         .totals-section {
           margin-top: 3mm;
           margin-bottom: 5mm;
           font-size: 10px;
+          font-weight: bold;
+          color: #000;
         }
         
         .total-row {
           display: flex;
           justify-content: space-between;
           padding: 1mm 0;
+          font-weight: bold;
         }
         
         .total-label {
           text-align: right;
           flex: 1;
+          font-weight: bold;
+          color: #000;
         }
         
         .total-amount {
           width: 25mm;
           text-align: right;
-          font-weight: normal;
+          font-weight: bold;
+          color: #000;
         }
         
         .final-total {
@@ -170,15 +193,18 @@ export function generateBillHTML(data: BillData): string {
           justify-content: space-between;
           padding: 2mm 0;
           font-size: 12px;
-          font-weight: bold;
-          border-top: 1px solid #000;
-          border-bottom: 1px solid #000;
+          font-weight: 900;
+          border-top: 2px solid #000;
+          border-bottom: 2px solid #000;
           margin-top: 2mm;
+          color: #000;
         }
         
         .final-amount {
           width: 25mm;
           text-align: right;
+          font-weight: 900;
+          color: #000;
         }
         
         .payment-info {
@@ -221,7 +247,7 @@ export function generateBillHTML(data: BillData): string {
     <body>
       <div class="bill-container">
         <div class="header">
-          <div class="store-name">🍽️ RESTAURANT</div>
+          <div class="store-name">GEN Z BETA CAFE</div>
           <div>BILL</div>
         </div>
         
