@@ -501,40 +501,35 @@ export function printKOT(data: KOTData): void {
 
 /**
  * Print multiple KOTs (for kitchen multiple copies)
- * Opens print dialog twice - user presses print twice (one KOT per dialog)
+ * Single click prints two KOTs consecutively from one window
  */
 export function printMultipleKOTs(data: KOTData, copies: number = 2): void {
-  // Function to open print dialog with single KOT
-  const openPrintDialog = (printCount: number) => {
-    const singleKotHTML = generateSingleKOTHTML(data);
-    const printWindow = window.open('', '_blank', 'width=400,height=600');
+  const kotHTML = generateKOTHTML(data);
+  const printWindow = window.open('', '_blank', 'width=400,height=600');
+  
+  if (printWindow) {
+    printWindow.document.write(kotHTML);
+    printWindow.document.close();
     
-    if (printWindow) {
-      printWindow.document.write(singleKotHTML);
-      printWindow.document.close();
-      
-      printWindow.onload = () => {
+    printWindow.onload = () => {
+      setTimeout(() => {
+        // First print
+        printWindow.print();
+        
+        // Second print after first completes
         setTimeout(() => {
           printWindow.print();
-          // Close window after user finishes printing
+          
+          // Close window after both prints
           setTimeout(() => {
             printWindow.close();
-            // Open second print dialog if needed
-            if (printCount < copies) {
-              setTimeout(() => {
-                openPrintDialog(printCount + 1);
-              }, 500);
-            }
-          }, 500);
-        }, 200);
-      };
-    } else {
-      alert('Please allow popups to print KOT');
-    }
-  };
-  
-  // Start with first print
-  openPrintDialog(1);
+          }, 1500);
+        }, 1500);
+      }, 300);
+    };
+  } else {
+    alert('Please allow popups to print KOT');
+  }
 }
 
 /**
