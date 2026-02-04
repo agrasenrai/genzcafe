@@ -113,8 +113,9 @@ export function generateKOTHTML(data: KOTData): string {
           width: 100%;
           text-align: center;
           display: block;
-          padding: 2mm 3mm;
+          padding: 1mm 4mm;
           page-break-after: always;
+          margin-bottom: 3mm;
         }
         
         .kot-container:last-child {
@@ -124,39 +125,39 @@ export function generateKOTHTML(data: KOTData): string {
         .header-title {
           text-align: center;
           font-weight: 900;
-          font-size: 20px;
-          margin-bottom: 1mm !important;
+          font-size: 24px;
+          margin-bottom: 1.5mm !important;
           letter-spacing: 2px;
-          line-height: 1.2;
+          line-height: 1.1;
           color: #000;
         }
         
         .restaurant-name {
           text-align: center;
           font-weight: 900;
-          font-size: 13px;
-          margin-bottom: 2mm !important;
-          line-height: 1.2;
+          font-size: 15px;
+          margin-bottom: 3mm !important;
+          line-height: 1.1;
           color: #000;
         }
         
         .order-details {
-          font-size: 12px;
-          margin-bottom: 2mm !important;
+          font-size: 13px;
+          margin-bottom: 3mm !important;
           text-align: left;
-          line-height: 1.3;
+          line-height: 1.4;
           font-weight: bold;
           color: #000;
         }
         
         .detail-row {
           display: flex;
-          margin-bottom: 0.5mm !important;
+          margin-bottom: 0.8mm !important;
         }
         
         .detail-label {
           font-weight: 900;
-          width: 40mm;
+          width: 38mm;
           color: #000;
         }
         
@@ -167,11 +168,11 @@ export function generateKOTHTML(data: KOTData): string {
         }
         
         .items-header {
-          font-size: 12px;
+          font-size: 13px;
           font-weight: 900;
-          margin-top: 2mm !important;
-          margin-bottom: 1mm !important;
-          padding-bottom: 1mm !important;
+          margin-top: 3mm !important;
+          margin-bottom: 1.5mm !important;
+          padding-bottom: 1.5mm !important;
           border-bottom: 2px solid #000;
           display: flex;
           justify-content: space-between;
@@ -185,22 +186,24 @@ export function generateKOTHTML(data: KOTData): string {
         }
         
         .item-qty-header {
-          width: 25mm;
+          width: 23mm;
           text-align: right;
           font-weight: 900;
         }
         
         .items-list {
-          margin-bottom: 0mm !important;
+          margin-bottom: 2mm !important;
+          padding-bottom: 2mm !important;
+          border-bottom: 1px dotted #000;
         }
         
         .item-row {
-          font-size: 12px;
-          margin-bottom: 0.8mm !important;
+          font-size: 13px;
+          margin-bottom: 1.2mm !important;
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
-          line-height: 1.3;
+          line-height: 1.4;
           font-weight: bold;
           color: #000;
         }
@@ -213,7 +216,7 @@ export function generateKOTHTML(data: KOTData): string {
         }
         
         .item-qty {
-          width: 25mm;
+          width: 23mm;
           text-align: right;
           font-weight: 900;
           color: #000;
