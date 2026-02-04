@@ -135,6 +135,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </li>
             <li>
               <Link 
+                href="/admin/counter" 
+                className={`block px-4 py-2 hover:bg-gray-700 ${pathname?.startsWith('/admin/counter') ? 'bg-gray-700' : ''}`}
+              >
+                Counter Booking (POS)
+              </Link>
+            </li>
+            <li>
+              <Link 
                 href="/admin/menu" 
                 className={`block px-4 py-2 hover:bg-gray-700 ${pathname?.startsWith('/admin/menu') ? 'bg-gray-700' : ''}`}
               >
@@ -192,6 +200,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <h1 className="text-lg font-semibold text-gray-900">
               {pathname === '/admin' && 'Dashboard'}
               {pathname === '/admin/orders' && 'Orders'}
+              {pathname === '/admin/counter' && 'Counter Booking (POS)'}
               {pathname === '/admin/menu' && 'Menu Management'}
               {pathname === '/admin/categories' && 'Categories Management'}
               {pathname === '/admin/users' && 'User Management'}

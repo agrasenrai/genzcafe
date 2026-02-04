@@ -396,9 +396,8 @@ export function printBillAutomatically(data: BillData): void {
         }, 1000);
       }, 300);
     };
-  } else {
-    alert('Please allow popups to print bill');
   }
+  // Silently handle popup blocker - window.open returns null if blocked
 }
 
 /**

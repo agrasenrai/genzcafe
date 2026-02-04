@@ -521,9 +521,8 @@ export function printMultipleKOTs(data: KOTData, copies: number = 2): void {
         }, 100);
       }, 20);
     };
-  } else {
-    alert('Please allow popups to print KOT');
   }
+  // Silently handle popup blocker - window.open returns null if blocked
 }
 
 /**

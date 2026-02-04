@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { playNotificationSound } from '@/lib/utils/notificationSound';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
@@ -56,6 +57,7 @@ interface OrderWithFeedback extends Order {
 //redd
 //redddd
 export default function OrdersPage() {
+  const searchParams = useSearchParams();
   const [orders, setOrders] = useState<OrderWithFeedback[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -134,6 +136,12 @@ export default function OrdersPage() {
       setLoading(false);
     }
   }, [sortBy]);
+
+  useEffect(() => {
+    if (searchParams?.get('fullscreen') === '1') {
+      setIsFullscreen(true);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     fetchOrders();
@@ -369,7 +377,7 @@ export default function OrdersPage() {
       <div className={isFullscreen ? 'fixed inset-0 z-40 bg-white overflow-hidden flex flex-col' : ''}>
         {/* Fullscreen Icon - Visible in both modes */}
         {isFullscreen && (
-          <div className="absolute top-2 right-2 z-50">
+          <div className="absolute top-2 right-2 z-50 flex flex-col gap-2">
             <button
               onClick={() => setIsFullscreen(false)}
               className="p-1 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition-all shadow-md"
@@ -379,6 +387,15 @@ export default function OrdersPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
+            <Link
+              href="/admin/counter?fullscreen=1"
+              className="p-1 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-all shadow-md"
+              title="Go to POS"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7h18M5 7v12a2 2 0 002 2h10a2 2 0 002-2V7M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2" />
+              </svg>
+            </Link>
           </div>
         )}
 

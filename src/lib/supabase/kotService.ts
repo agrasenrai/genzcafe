@@ -49,7 +49,7 @@ export function formatOrderForKOT(order: any) {
         minute: '2-digit',
         hour12: true
       })
-    : null;
+    : undefined;
 
   return {
     orderId: order.id,
@@ -59,7 +59,7 @@ export function formatOrderForKOT(order: any) {
     items: order.order_items.map((item: any) => ({
       name: item.name,
       quantity: item.quantity,
-      specialInstructions: null
+      specialInstructions: undefined
     })),
     deliveryAddress: order.delivery_address,
     scheduledTime: scheduledTime
