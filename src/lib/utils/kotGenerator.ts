@@ -113,9 +113,12 @@ export function generateKOTHTML(data: KOTData): string {
           width: 100%;
           text-align: center;
           display: block;
-          padding: 1mm 4mm;
+          padding: 1mm 5mm;
           page-break-after: always;
           margin-bottom: 3mm;
+          max-width: 80mm;
+          margin-left: auto;
+          margin-right: auto;
         }
         
         .kot-container:last-child {
@@ -157,14 +160,19 @@ export function generateKOTHTML(data: KOTData): string {
         
         .detail-label {
           font-weight: 900;
-          width: 38mm;
+          width: 30mm;
           color: #000;
+          flex-shrink: 0;
         }
         
         .detail-value {
           flex: 1;
           font-weight: bold;
           color: #000;
+          word-wrap: break-word;
+          overflow: hidden;
+          text-align: left;
+          margin-left: 1mm;
         }
         
         .items-header {
@@ -183,12 +191,15 @@ export function generateKOTHTML(data: KOTData): string {
         .item-name-header {
           flex: 1;
           font-weight: 900;
+          min-width: 0;
+          text-align: left;
         }
         
         .item-qty-header {
-          width: 23mm;
+          width: 18mm;
           text-align: right;
           font-weight: 900;
+          flex-shrink: 0;
         }
         
         .items-list {
@@ -213,13 +224,18 @@ export function generateKOTHTML(data: KOTData): string {
           word-wrap: break-word;
           font-weight: bold;
           color: #000;
+          min-width: 0;
+          overflow-wrap: break-word;
+          text-align: left;
         }
         
         .item-qty {
-          width: 23mm;
+          width: 18mm;
           text-align: right;
           font-weight: 900;
           color: #000;
+          flex-shrink: 0;
+          margin-left: 1mm;
         }
       </style>
     </head>
