@@ -42,19 +42,39 @@ interface CartContextType {
   applyCoupon: (code: string, userId?: string | null) => Promise<CouponValidationResult>;
   removeCoupon: () => void;
   couponLoading: boolean;
+  totals: CartTotals | null;
+  totalsLoading: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
+
+// Cache for platform fees to avoid repeated fetches
+let platformFeesCache: any = null;
+let platformFeesCacheTime = 0;
+const PLATFORM_FEES_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+async function getCachedPlatformFees() {
+  const now = Date.now();
+  if (platformFeesCache && (now - platformFeesCacheTime) < PLATFORM_FEES_CACHE_DURATION) {
+    return platformFeesCache;
+  }
+  const fees = await getPlatformFees();
+  platformFeesCache = fees;
+  platformFeesCacheTime = now;
+  return fees;
+}
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
   const [couponLoading, setCouponLoading] = useState(false);
+  const [totals, setTotals] = useState<CartTotals | null>(null);
+  const [totalsLoading, setTotalsLoading] = useState(false);
 
-  // Load cart from localStorage on mount
+  // Load cart from sessionStorage on mount (clears when browser closes)
   useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
-    const savedCoupon = localStorage.getItem('appliedCoupon');
+    const savedCart = sessionStorage.getItem('cart');
+    const savedCoupon = sessionStorage.getItem('appliedCoupon');
     
     if (savedCart) {
       try {
@@ -73,17 +93,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Save cart to localStorage whenever it changes
+  // Save cart to sessionStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(items));
+    sessionStorage.setItem('cart', JSON.stringify(items));
   }, [items]);
   
-  // Save coupon to localStorage whenever it changes
+  // Save coupon to sessionStorage whenever it changes
   useEffect(() => {
     if (appliedCoupon) {
-      localStorage.setItem('appliedCoupon', JSON.stringify(appliedCoupon));
+      sessionStorage.setItem('appliedCoupon', JSON.stringify(appliedCoupon));
     } else {
-      localStorage.removeItem('appliedCoupon');
+      sessionStorage.removeItem('appliedCoupon');
     }
   }, [appliedCoupon]);
 
@@ -164,26 +184,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const totalPriceWithGST = items.reduce((total, item) => total + (item.price * item.quantity), 0);
     
     try {
-      const fees = await getPlatformFees();
+      // Use cached fees for faster calculations
+      const fees = await getCachedPlatformFees();
       
       // Calculate base price and GST using the correct formula
-      // base_price = total_price / 1.05
-      // gst_amount = total_price - base_price
       const basePrice = totalPriceWithGST / 1.05;
       const gstAmount = totalPriceWithGST - basePrice;
       
-      // Round the values properly
       const itemTotal = Math.round(basePrice * 100) / 100;
       const gst = Math.round(gstAmount * 100) / 100;
-      
-      console.log('Fee calculation debug:', {
-        totalPriceWithGST,
-        itemTotal,
-        gst,
-        gstRate: fees.gstRate,
-        platformFeeEnabled: fees.platformFeeEnabled,
-        platformFee: fees.platformFee
-      });
       
       // Platform fee from settings (if enabled)
       const platformFee = fees.platformFeeEnabled ? (Math.round((fees.platformFee || 0) * 100) / 100) : 0;
@@ -196,14 +205,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       
       // Calculate final total
       const finalTotal = Math.round(Math.max(0, itemTotal + gst + platformFee + deliveryCharge - discountAmount) * 100) / 100;
-      
-      console.log('Calculated totals:', {
-        itemTotal,
-        gst,
-        platformFee,
-        discountAmount,
-        finalTotal
-      });
       
       return {
         itemTotal,
@@ -221,19 +222,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       
       const itemTotal = Math.round(basePrice * 100) / 100;
       const gst = Math.round(gstAmount * 100) / 100;
-      const platformFee = 15.00;
+      const platformFee = 0.00;
       const deliveryCharge = 0;
       const discountAmount = appliedCoupon ? Math.round(appliedCoupon.discountAmount * 100) / 100 : 0;
       const finalTotal = Math.round(Math.max(0, itemTotal + gst + platformFee + deliveryCharge - discountAmount) * 100) / 100;
-      
-      console.log('Using fallback totals:', {
-        totalPriceWithGST,
-        itemTotal,
-        gst,
-        platformFee,
-        discountAmount,
-        finalTotal
-      });
       
       return {
         itemTotal,
@@ -245,6 +237,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       };
     }
   };
+
+  // Auto-calculate totals when items or coupon change
+  useEffect(() => {
+    const updateTotals = async () => {
+      setTotalsLoading(true);
+      try {
+        const newTotals = await calculateTotals();
+        setTotals(newTotals);
+      } finally {
+        setTotalsLoading(false);
+      }
+    };
+    
+    updateTotals();
+  }, [items, appliedCoupon]);
 
   const itemCount = items.reduce(
     (count, item) => count + item.quantity,
@@ -265,6 +272,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         applyCoupon,
         removeCoupon,
         couponLoading,
+        totals,
+        totalsLoading,
       }}
     >
       {children}

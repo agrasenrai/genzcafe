@@ -104,14 +104,21 @@ function getCurrentDayName(): string {
  * Check if restaurant is open
  */
 export async function isRestaurantOpen(): Promise<boolean> {
-  const settings = await getRestaurantSettings();
-  if (!settings) return false;
+  let settings: RestaurantSettings | null = null;
+  try {
+    settings = await getRestaurantSettings();
+  } catch (error) {
+    console.error('Error fetching restaurant settings for open check:', error);
+    return true; // Avoid false-closed on transient errors
+  }
+  if (!settings) return true; // Avoid false-closed when settings are unavailable
   
   // First check if manually closed
   if (!settings.is_open) return false;
   
   // Then check business hours
   if (!settings.business_hours) return true; // If no hours set, assume open
+  if (settings.business_hours.trim().toLowerCase() === 'closed') return false;
   
   try {
     const hours = settings.business_hours;
@@ -255,6 +262,7 @@ export async function getRestaurantInfo() {
 export async function getTodaysHours(): Promise<string> {
   const settings = await getRestaurantSettings();
   if (!settings || !settings.business_hours) return 'Today: 11:00 AM - 10:00 PM';
+  if (settings.business_hours.trim().toLowerCase() === 'closed') return 'Today: Closed';
   
   try {
     const hours = settings.business_hours;

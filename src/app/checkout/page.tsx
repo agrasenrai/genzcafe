@@ -10,7 +10,7 @@ import { getPlatformFees, getRestaurantSettings, isRestaurantOpen, getDeliveryPo
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, clearCart, calculateTotals, appliedCoupon, applyCoupon, removeCoupon, couponLoading } = useCart();
+  const { items, clearCart, appliedCoupon, applyCoupon, removeCoupon, couponLoading, totals, totalsLoading } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
   const [scheduledTime, setScheduledTime] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'cash'>('cash');
@@ -47,14 +47,6 @@ export default function CheckoutPage() {
   };
   const [orderError, setOrderError] = useState<string | null>(null);
   const [timeError, setTimeError] = useState<string | null>(null);
-  const [totals, setTotals] = useState({
-    itemTotal: 0,
-    gst: 0,
-    platformFee: 0,
-    deliveryCharge: 0,
-    discountAmount: 0,
-    finalTotal: 0
-  });
   const [taxRate, setTaxRate] = useState(5); // Default to 5% but will be updated from settings
   const [paymentSettings, setPaymentSettings] = useState({
     accept_credit_cards: true,
@@ -75,16 +67,24 @@ export default function CheckoutPage() {
   const [couponCode, setCouponCode] = useState('');
   const [couponError, setCouponError] = useState<string | null>(null);
 
-  // Calculate totals, tax rate, and payment settings whenever items change
+  // Use totals from context, fallback to defaults if loading
+  const displayTotals = totals || {
+    itemTotal: 0,
+    gst: 0,
+    platformFee: 0,
+    deliveryCharge: 0,
+    discountAmount: 0,
+    finalTotal: 0
+  };
+
+  // Load settings and tax rate on mount
   useEffect(() => {
-    const loadSettingsAndTotals = async () => {
-      const [calculatedTotals, fees, restaurantSettings] = await Promise.all([
-        calculateTotals(),
+    const loadSettings = async () => {
+      const [fees, restaurantSettings] = await Promise.all([
         getPlatformFees(),
         getRestaurantSettings()
       ]);
       
-      setTotals(calculatedTotals);
       setTaxRate(Math.round(fees.gstRate * 100)); // Convert decimal to percentage
       
       if (restaurantSettings) {
@@ -101,41 +101,18 @@ export default function CheckoutPage() {
         }
       }
     };
-    loadSettingsAndTotals();
-  }, [items, calculateTotals, appliedCoupon]);
-
-  const finalAmount = totals.finalTotal - totals.deliveryCharge;
-  
-  // Is ASAP delivery selected?
-  const isASAPPickup = scheduledTime === '';
-
-  // Update payment method when pickup time or settings change
-  useEffect(() => {
-    // If not ASAP and payment method is cash, switch to card
-    if (!isASAPPickup && paymentMethod === 'cash') {
-      if (paymentSettings.accept_credit_cards) {
-        setPaymentMethod('card');
-      }
-    }
     
-    // If current payment method is not available, switch to an available one
-    if (paymentMethod === 'card' && !paymentSettings.accept_credit_cards) {
-      if (paymentSettings.accept_cash) {
-        setPaymentMethod('cash');
-      }
-    } else if (paymentMethod === 'cash' && !paymentSettings.accept_cash) {
-      if (paymentSettings.accept_credit_cards) {
-        setPaymentMethod('card');
-      }
-    }
-  }, [scheduledTime, isASAPPickup, paymentMethod, paymentSettings]);
+    loadSettings();
+  }, []);
 
+  // Check if we have items in the cart
   useEffect(() => {
-    // Check if we have items in the cart
     if (items.length === 0) {
       router.push('/menu');
     }
   }, [items.length, router]);
+
+  const finalAmount = displayTotals.finalTotal - displayTotals.deliveryCharge;
 
   // If no items, the useEffect will handle redirection
   if (items.length === 0) {
@@ -220,14 +197,14 @@ export default function CheckoutPage() {
         delivery_address: selectedDeliveryPoint || null, // Selected pickup location
         scheduled_time: formattedScheduledTime,
         payment_method: paymentMethod,
-        item_total: totals.itemTotal,
-        gst: totals.gst,
-        platform_fee: totals.platformFee,
+        item_total: displayTotals.itemTotal,
+        gst: displayTotals.gst,
+        platform_fee: displayTotals.platformFee,
         delivery_charge: 0, // No delivery charge since only pickup is available
         final_total: finalAmount,
         coupon_id: appliedCoupon?.couponId || null,
         coupon_code: appliedCoupon?.code || null,
-        discount_amount: totals.discountAmount,
+        discount_amount: displayTotals.discountAmount,
         order_items: orderItems,
         customer_name: customerName,
         customer_phone: customerPhone,
@@ -244,11 +221,11 @@ export default function CheckoutPage() {
       const orderDetails = {
         id: orderId,
         items,
-        itemTotal: totals.itemTotal,
-        gst: totals.gst,
-        platformFee: totals.platformFee,
+        itemTotal: displayTotals.itemTotal,
+        gst: displayTotals.gst,
+        platformFee: displayTotals.platformFee,
         deliveryCharge: 0,
-        discountAmount: totals.discountAmount,
+        discountAmount: displayTotals.discountAmount,
         finalTotal: finalAmount,
         orderType: 'pickup',
         deliveryAddress: selectedDeliveryPoint || null,
@@ -673,17 +650,17 @@ export default function CheckoutPage() {
               <div className="space-y-1 text-xs bg-gradient-to-b from-purple-50 to-transparent rounded p-2 -mx-2 mb-2">
                 <div className="flex justify-between text-gray-600">
                   <span className="font-light">Item Total (Without GST)</span>
-                  <span className="font-medium">₹{totals.itemTotal.toFixed(2)}</span>
+                  <span className="font-medium">₹{displayTotals.itemTotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span className="font-light">GST ({taxRate}%)</span>
-                  <span className="font-medium">₹{totals.gst.toFixed(2)}</span>
+                  <span className="font-medium">₹{displayTotals.gst.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span className="font-light">Platform Fee</span>
-                  <span className="font-medium">₹{totals.platformFee.toFixed(2)}</span>
+                  <span className="font-medium">₹{displayTotals.platformFee.toFixed(2)}</span>
                 </div>
-                {totals.discountAmount > 0 && (
+                {displayTotals.discountAmount > 0 && (
                   <div className="flex justify-between text-yellow-700 items-center border-t border-gray-100 pt-1 mt-1">
                     <span className="flex items-center gap-1 font-light">
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -691,7 +668,7 @@ export default function CheckoutPage() {
                       </svg>
                       Discount
                     </span>
-                    <span className="font-semibold">-₹{totals.discountAmount.toFixed(2)}</span>
+                    <span className="font-semibold">-₹{displayTotals.discountAmount.toFixed(2)}</span>
                   </div>
                 )}
               </div>

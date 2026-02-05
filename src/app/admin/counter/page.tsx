@@ -125,9 +125,12 @@ export default function CounterBookingPage() {
   };
 
   const calculateTotal = () => {
-    const itemTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const gst = itemTotal * 0.05;
-    const finalTotal = itemTotal + gst;
+    // Prices are GST-inclusive. Compute item total excluding GST, GST amount, and final (gross) total.
+    const gross = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const gstRate = 0.05;
+    const itemTotal = Number((gross / (1 + gstRate)).toFixed(2)); // excluding GST
+    const gst = Number((gross - itemTotal).toFixed(2)); // total GST amount
+    const finalTotal = Number(gross.toFixed(2)); // gross (inclusive)
     return { itemTotal, gst, finalTotal };
   };
 
@@ -219,8 +222,7 @@ export default function CounterBookingPage() {
         setTimeout(() => setPrintMessage(null), 3000);
       }, 1100);
 
-      // Clear cart
-      clearCart();
+      // Do not clear cart here — keep it until user explicitly reprints the bill
       
       // Show success message without alert dialog
       console.log(`Order placed successfully! Order #${otp}`);
@@ -495,19 +497,52 @@ export default function CounterBookingPage() {
                   ) : '🚀 Place Order & Print'}
                 </button>
 
-                {lastOrder && (
+                {cart.length > 0 && (
                   <button
                     onClick={() => {
-                      printBillAutomatically(lastOrder.billData);
-                      setPrintMessage('Reprinting bill...');
-                      setTimeout(() => setPrintMessage(null), 2000);
+                      // Build a temporary order object from current cart for billing
+                      const nowIso = new Date().toISOString();
+                      const otp = Math.floor(1000 + Math.random() * 9000).toString();
+                      const totals = calculateTotal();
+                      const orderLike: any = {
+                        id: `temp-${nowIso}`,
+                        created_at: nowIso,
+                        otp: otp,
+                        customer_name: customerName || 'Counter',
+                        customer_phone: 'counter',
+                        customer_email: 'counter@counter.com',
+                        delivery_address: 'Counter',
+                        order_items: cart.map(i => ({
+                          id: i.id,
+                          name: i.name,
+                          quantity: i.quantity,
+                          price: i.price
+                        })),
+                        // match DB field names expected by formatOrderForBill
+                        item_total: totals.itemTotal,
+                        gst: totals.gst,
+                        platform_fee: 0,
+                        delivery_charge: 0,
+                        final_total: totals.finalTotal,
+                        payment_method: 'cash',
+                        payment_status: 'pending'
+                      };
+
+                      const billData = formatOrderForBill(orderLike);
+                      printBillAutomatically(billData);
+                      setPrintMessage('Printing bill for current cart...');
+                      // Clear cart after short delay so printing can begin
+                      setTimeout(() => {
+                        clearCart();
+                        setPrintMessage(null);
+                      }, 1500);
                     }}
                     className="w-full py-2 rounded-lg font-semibold text-sm bg-blue-500 text-white hover:bg-blue-600 transition-all shadow flex items-center justify-center gap-2"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    Reprint Last Bill
+                    Print Bill
                   </button>
                 )}
 

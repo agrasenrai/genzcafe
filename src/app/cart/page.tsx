@@ -10,43 +10,30 @@ export default function CartPage() {
     items, 
     removeItem, 
     updateQuantity, 
-    calculateTotals, 
     clearCart, 
     appliedCoupon, 
     applyCoupon, 
     removeCoupon, 
-    couponLoading 
+    couponLoading,
+    totals,
+    totalsLoading
   } = useCart();
   const [couponCode, setCouponCode] = useState('');
   const [couponError, setCouponError] = useState<string | null>(null);
   const [showCouponInput, setShowCouponInput] = useState(false);
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
-  const [totals, setTotals] = useState({
-    itemTotal: 0,
-    gst: 0,
-    platformFee: 0,
-    deliveryCharge: 0,
-    discountAmount: 0,
-    finalTotal: 0
-  });
   const [taxRate, setTaxRate] = useState(5); // Default to 5% but will be updated from settings
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // Calculate totals and tax rate whenever items change
+  // Load tax rate from settings once
   useEffect(() => {
-    const loadTotalsAndTaxRate = async () => {
-      const [calculatedTotals, fees] = await Promise.all([
-        calculateTotals(),
-        getPlatformFees()
-      ]);
-      setTotals(calculatedTotals);
+    getPlatformFees().then(fees => {
       setTaxRate(Math.round(fees.gstRate * 100)); // Convert decimal to percentage
-    };
-    loadTotalsAndTaxRate();
-  }, [items, calculateTotals, appliedCoupon]);
+    });
+  }, []);
 
-  // Destructure totals for easier access
-  const { itemTotal, gst, platformFee, deliveryCharge, discountAmount, finalTotal } = totals;
+  // Use totals from context, fallback to 0 values if loading
+  const { itemTotal = 0, gst = 0, platformFee = 0, deliveryCharge = 0, discountAmount = 0, finalTotal = 0 } = totals || {};
 
   // Check if scroll indicator should be shown
   useEffect(() => {
