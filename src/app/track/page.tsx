@@ -16,6 +16,7 @@ interface OrderItem {
   name: string;
   price: number;
   quantity: number;
+  packaging?: boolean;
 }
 
 interface OrderDetails {
@@ -24,6 +25,7 @@ interface OrderDetails {
   itemTotal: number;
   gst: number;
   platformFee: number;
+  packagingFee: number;
   deliveryCharge: number;
   discountAmount: number;
   finalTotal: number;
@@ -138,6 +140,7 @@ function TrackOrderContent() {
         itemTotal: data.item_total,
         gst: data.gst,
         platformFee: data.platform_fee,
+        packagingFee: data.packaging_fee || 0,
         deliveryCharge: data.delivery_charge,
         discountAmount: data.discount_amount || 0,
         finalTotal: data.final_total,
@@ -392,6 +395,11 @@ function TrackOrderContent() {
                     <div key={item.id} className="flex justify-between text-sm">
                       <span>
                         {item.quantity}x {item.name}
+                        {item.packaging && (
+                          <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-900 text-white">
+                            PACK
+                          </span>
+                        )}
                       </span>
                       <span>₹{(item.price * item.quantity).toFixed(2)}</span>
                     </div>
@@ -409,6 +417,12 @@ function TrackOrderContent() {
                       <span className="text-gray-600">Platform Fee</span>
                       <span>₹{order.platformFee.toFixed(2)}</span>
                     </div>
+                    {order.packagingFee > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Packaging Fee</span>
+                        <span>₹{order.packagingFee.toFixed(2)}</span>
+                      </div>
+                    )}
                     {order.discountAmount > 0 && (
                       <div className="flex justify-between text-sm text-green-600">
                         <span>Discount {order.couponCode ? `(${order.couponCode})` : ''}</span>
