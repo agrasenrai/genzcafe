@@ -145,6 +145,7 @@ export default function CounterBookingPage() {
   const clearCart = () => {
     setCart([]);
     setCustomerName('Counter');
+    setLastOrder(null);
   };
 
   const calculateTotal = () => {
@@ -171,7 +172,6 @@ export default function CounterBookingPage() {
     setLoading(true);
     try {
       const { itemTotal, gst, packagingFee, finalTotal } = calculateTotal();
-      const otp = Math.floor(1000 + Math.random() * 9000).toString();
       
       // Create order with counter defaults
       const { data: order, error: orderError } = await supabase
@@ -191,7 +191,6 @@ export default function CounterBookingPage() {
           packaging_fee: packagingFee,
           delivery_charge: 0,
           final_total: finalTotal,
-          otp: otp,
           status: 'ready'
         })
         .select()
@@ -255,7 +254,7 @@ export default function CounterBookingPage() {
       // Do not clear cart here — keep it until user explicitly reprints the bill
       
       // Show success message without alert dialog
-      console.log(`Order placed successfully! Order #${otp}`);
+      console.log(`Order placed successfully! Order #${order.otp}`);
     } catch (error: any) {
       console.error('Error placing order:', error);
       setPrintMessage(`Failed to place order: ${error.message || 'Unknown error'}`);
@@ -547,42 +546,11 @@ export default function CounterBookingPage() {
                   ) : '🚀 Place Order & Print'}
                 </button>
 
-                {cart.length > 0 && (
+                {lastOrder && (
                   <button
                     onClick={() => {
-                      // Build a temporary order object from current cart for billing
-                      const nowIso = new Date().toISOString();
-                      const otp = Math.floor(1000 + Math.random() * 9000).toString();
-                      const totals = calculateTotal();
-                      const orderLike: any = {
-                        id: `temp-${nowIso}`,
-                        created_at: nowIso,
-                        otp: otp,
-                        customer_name: customerName || 'Counter',
-                        customer_phone: 'counter',
-                        customer_email: 'counter@counter.com',
-                        delivery_address: 'Counter',
-                        order_items: cart.map(i => ({
-                          id: i.id,
-                          name: i.name,
-                          quantity: i.quantity,
-                          price: i.price
-                        })),
-                        // match DB field names expected by formatOrderForBill
-                        item_total: totals.itemTotal,
-                        gst: totals.gst,
-                        platform_fee: 0,
-                        packaging_fee: totals.packagingFee,
-                        delivery_charge: 0,
-                        final_total: totals.finalTotal,
-                        payment_method: 'cash',
-                        payment_status: 'completed'
-                      };
-
-                      const billData = formatOrderForBill(orderLike);
-                      printBillAutomatically(billData);
-                      setPrintMessage('Printing bill for current cart...');
-                      // Clear cart after short delay so printing can begin
+                      printBillAutomatically(lastOrder.billData);
+                      setPrintMessage('Printing bill...');
                       setTimeout(() => {
                         clearCart();
                         setPrintMessage(null);

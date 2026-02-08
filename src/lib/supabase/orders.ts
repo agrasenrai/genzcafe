@@ -1,5 +1,4 @@
 import { supabase } from './client';
-import { generateOTP } from '@/lib/utils/helpers';
 import { recordCouponUsage } from './coupons';
 
 // Order types
@@ -41,9 +40,6 @@ export interface OrderData {
  */
 export async function createOrder(orderData: OrderData) {
   try {
-    // Generate a unique OTP for the order
-    const otp = generateOTP();
-    
     // Set initial payment status based on payment method
     const paymentStatus = orderData.payment_method === 'cash' ? 'completed' : 'pending';
     
@@ -70,10 +66,9 @@ export async function createOrder(orderData: OrderData) {
         customer_email: orderData.customer_email,
         status: paymentStatus === 'completed' ? 'pending' : 'awaiting_payment',
         payment_status: paymentStatus,
-        payment_id: orderData.payment_id || null,
-        otp
+        payment_id: orderData.payment_id || null
       })
-      .select('id')
+      .select('id, otp')
       .single();
 
     if (orderError) throw orderError;
@@ -109,7 +104,7 @@ export async function createOrder(orderData: OrderData) {
       }
     }
     
-    return { orderId: order.id, otp };
+    return { orderId: order.id, otp: order.otp };
   } catch (error) {
     console.error('Error creating order:', error);
     throw error;

@@ -1,12 +1,4 @@
 /**
- * Generates a 6-digit one-time password (OTP) for order tracking
- * @returns {string} 6-digit OTP
- */
-export function generateOTP(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-}
-
-/**
  * Format price to INR currency
  * @param {number} price - The price to format
  * @returns {string} Formatted price string
