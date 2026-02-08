@@ -9,6 +9,14 @@ ALTER TABLE public.orders
 ADD COLUMN IF NOT EXISTS payment_status TEXT 
 CHECK (payment_status IN ('pending', 'completed', 'failed'));
 
+-- Add packaging_fee column
+ALTER TABLE public.orders 
+ADD COLUMN IF NOT EXISTS packaging_fee DECIMAL(10, 2) DEFAULT 0.00;
+
+-- Add packaging column to order_items
+ALTER TABLE public.order_items 
+ADD COLUMN IF NOT EXISTS packaging BOOLEAN DEFAULT false;
+
 -- Update RLS policies to include awaiting_payment status
 ALTER TABLE public.orders 
 DROP CONSTRAINT IF EXISTS orders_status_check;

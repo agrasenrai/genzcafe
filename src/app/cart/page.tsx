@@ -10,6 +10,7 @@ export default function CartPage() {
     items, 
     removeItem, 
     updateQuantity, 
+    togglePackaging,
     clearCart, 
     appliedCoupon, 
     applyCoupon, 
@@ -33,7 +34,7 @@ export default function CartPage() {
   }, []);
 
   // Use totals from context, fallback to 0 values if loading
-  const { itemTotal = 0, gst = 0, platformFee = 0, deliveryCharge = 0, discountAmount = 0, finalTotal = 0 } = totals || {};
+  const { itemTotal = 0, gst = 0, platformFee = 0, packagingFee = 0, deliveryCharge = 0, discountAmount = 0, finalTotal = 0 } = totals || {};
 
   // Check if scroll indicator should be shown
   useEffect(() => {
@@ -187,6 +188,18 @@ export default function CartPage() {
                   ₹{(item.price * item.quantity).toFixed(2)}
                 </div>
               </div>
+              <div className="mt-2 flex items-center">
+                <input
+                  type="checkbox"
+                  id={`packaging-${item.id}`}
+                  checked={item.packaging || false}
+                  onChange={() => togglePackaging(item.id)}
+                  className="h-3 w-3 text-yellow-600 focus:ring-yellow-500 border-gray-300 rounded"
+                />
+                <label htmlFor={`packaging-${item.id}`} className="ml-2 text-xs text-gray-600">
+                  Add Packaging
+                </label>
+              </div>
             </div>
           ))}
         </div>
@@ -306,6 +319,12 @@ export default function CartPage() {
                 <span>Platform Fee</span>
                 <span className="font-semibold">₹{platformFee.toFixed(2)}</span>
               </div>
+              {packagingFee > 0 && (
+                <div className="flex justify-between text-gray-700">
+                  <span>Packaging Fee</span>
+                  <span className="font-semibold">₹{packagingFee.toFixed(2)}</span>
+                </div>
+              )}
               {discountAmount > 0 && (
                 <div className="flex justify-between text-green-600 font-semibold border-t border-gray-200 pt-1.5 mt-1.5">
                   <span>Discount</span>

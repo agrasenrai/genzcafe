@@ -7,6 +7,7 @@ interface KOTItem {
   name: string;
   quantity: number;
   specialInstructions?: string;
+  packaging?: boolean;
 }
 
 interface KOTData {
@@ -63,7 +64,7 @@ export function generateSingleKOTHTML(data: KOTData): string {
       <div class="items-list">
         ${data.items.map(item => `
           <div class="item-row">
-            <div class="item-name">${item.name}</div>
+            <div class="item-name">${item.name}${item.packaging ? ' <span class="item-badge">PACK</span>' : ''}</div>
             <div class="item-qty">${item.quantity}</div>
           </div>
         `).join('')}
@@ -231,6 +232,15 @@ export function generateSingleKOTHTML(data: KOTData): string {
           color: #000;
           flex-shrink: 0;
           margin-left: 1mm;
+        }
+
+        .item-badge {
+          display: inline-block;
+          font-size: 10px;
+          font-weight: 900;
+          border: 1px solid #000;
+          padding: 0 2px;
+          margin-left: 2px;
         }
       </style>
     </head>
@@ -287,7 +297,7 @@ export function generateKOTHTML(data: KOTData): string {
       <div class="items-list">
         ${data.items.map(item => `
           <div class="item-row">
-            <div class="item-name">${item.name}</div>
+            <div class="item-name">${item.name}${item.packaging ? ' <span class="item-badge">PACK</span>' : ''}</div>
             <div class="item-qty">${item.quantity}</div>
           </div>
         `).join('')}
@@ -455,6 +465,15 @@ export function generateKOTHTML(data: KOTData): string {
           color: #000;
           flex-shrink: 0;
           margin-left: 1mm;
+        }
+
+        .item-badge {
+          display: inline-block;
+          font-size: 10px;
+          font-weight: 900;
+          border: 1px solid #000;
+          padding: 0 2px;
+          margin-left: 2px;
         }
       </style>
     </head>

@@ -10,6 +10,7 @@ export interface OrderItem {
   name: string;
   price: number;
   quantity: number;
+  packaging?: boolean;
 }
 
 export interface OrderData {
@@ -21,6 +22,7 @@ export interface OrderData {
   item_total: number;
   gst: number;
   platform_fee: number;
+  packaging_fee: number;
   delivery_charge: number;
   final_total: number;
   coupon_id?: string | null;
@@ -57,6 +59,7 @@ export async function createOrder(orderData: OrderData) {
         item_total: orderData.item_total,
         gst: orderData.gst,
         platform_fee: orderData.platform_fee,
+        packaging_fee: orderData.packaging_fee,
         delivery_charge: 0,  // Always 0 since we only support pickup
         final_total: orderData.final_total,
         coupon_id: orderData.coupon_id,
@@ -81,7 +84,8 @@ export async function createOrder(orderData: OrderData) {
       menu_item_id: item.menu_item_id,
       name: item.name,
       price: item.price,
-      quantity: item.quantity
+      quantity: item.quantity,
+      packaging: item.packaging ?? false
     }));
     
     const { error: itemsError } = await supabase

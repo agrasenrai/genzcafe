@@ -72,6 +72,7 @@ export default function CheckoutPage() {
     itemTotal: 0,
     gst: 0,
     platformFee: 0,
+    packagingFee: 0,
     deliveryCharge: 0,
     discountAmount: 0,
     finalTotal: 0
@@ -187,7 +188,8 @@ export default function CheckoutPage() {
         menu_item_id: item.id,
         name: item.name,
         price: item.price,
-        quantity: item.quantity
+        quantity: item.quantity,
+        packaging: item.packaging ?? false
       }));
       
       // Create the order data structure
@@ -200,6 +202,7 @@ export default function CheckoutPage() {
         item_total: displayTotals.itemTotal,
         gst: displayTotals.gst,
         platform_fee: displayTotals.platformFee,
+        packaging_fee: displayTotals.packagingFee,
         delivery_charge: 0, // No delivery charge since only pickup is available
         final_total: finalAmount,
         coupon_id: appliedCoupon?.couponId || null,
@@ -224,6 +227,7 @@ export default function CheckoutPage() {
         itemTotal: displayTotals.itemTotal,
         gst: displayTotals.gst,
         platformFee: displayTotals.platformFee,
+        packagingFee: displayTotals.packagingFee,
         deliveryCharge: 0,
         discountAmount: displayTotals.discountAmount,
         finalTotal: finalAmount,
@@ -660,6 +664,12 @@ export default function CheckoutPage() {
                   <span className="font-light">Platform Fee</span>
                   <span className="font-medium">₹{displayTotals.platformFee.toFixed(2)}</span>
                 </div>
+                {displayTotals.packagingFee > 0 && (
+                  <div className="flex justify-between text-gray-600">
+                    <span className="font-light">Packaging Fee</span>
+                    <span className="font-medium">₹{displayTotals.packagingFee.toFixed(2)}</span>
+                  </div>
+                )}
                 {displayTotals.discountAmount > 0 && (
                   <div className="flex justify-between text-yellow-700 items-center border-t border-gray-100 pt-1 mt-1">
                     <span className="flex items-center gap-1 font-light">

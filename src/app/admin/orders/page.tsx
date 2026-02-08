@@ -18,6 +18,7 @@ interface OrderItem {
   price: number;
   quantity: number;
   menu_item_id: string;
+  packaging?: boolean;
 }
 
 interface Order {
@@ -36,6 +37,7 @@ interface Order {
   item_total: number;
   gst: number;
   platform_fee: number;
+  packaging_fee: number;
   delivery_charge: number;
   final_total: number;
   otp: string;
@@ -61,7 +63,7 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<OrderWithFeedback[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('active');
   const [locationFilter, setLocationFilter] = useState<'all' | 'takeaway' | 'delivery'>('all');
   const [sortBy, setSortBy] = useState('newest');
   const [modalOpen, setModalOpen] = useState(false);
@@ -736,7 +738,14 @@ export default function OrdersPage() {
                     <tbody className="bg-white divide-y divide-gray-200">
                       {selectedOrder.order_items.map((item) => (
                         <tr key={item.id}>
-                          <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{item.name}</td>
+                          <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+                            <span>{item.name}</span>
+                            {item.packaging && (
+                              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-900 text-white">
+                                PACK
+                              </span>
+                            )}
+                          </td>
                           <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 text-right">{item.quantity}</td>
                           <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900 text-right">{formatPrice(item.price * item.quantity)}</td>
                         </tr>
@@ -755,6 +764,12 @@ export default function OrdersPage() {
                         <td className="px-4 py-2 text-sm text-gray-500" colSpan={2}>Platform Fee</td>
                         <td className="px-4 py-2 text-sm text-gray-900 text-right">{formatPrice(selectedOrder.platform_fee)}</td>
                       </tr>
+                      {selectedOrder.packaging_fee > 0 && (
+                        <tr>
+                          <td className="px-4 py-2 text-sm text-gray-500" colSpan={2}>Packaging Fee</td>
+                          <td className="px-4 py-2 text-sm text-gray-900 text-right">{formatPrice(selectedOrder.packaging_fee)}</td>
+                        </tr>
+                      )}
                       {selectedOrder.delivery_charge > 0 && (
                         <tr>
                           <td className="px-4 py-2 text-sm text-gray-500" colSpan={2}>Delivery Fee</td>

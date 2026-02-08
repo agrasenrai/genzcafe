@@ -21,6 +21,8 @@ interface RestaurantSettings {
   tax_rate: number | null;
   platform_fee: number | null;
   platform_fee_enabled: boolean;
+  packaging_fee: number | null;
+  packaging_fee_enabled: boolean;
   is_open: boolean;
   accept_credit_cards: boolean;
   accept_cash: boolean;
@@ -209,6 +211,8 @@ export default function SettingsPage() {
             tax_rate: 5,
             platform_fee: 15,
             platform_fee_enabled: true,
+            packaging_fee: 0,
+            packaging_fee_enabled: false,
             is_open: true,
             accept_credit_cards: true,
             accept_cash: true,
@@ -816,6 +820,38 @@ export default function SettingsPage() {
                       Accept Cash on Pickup/Delivery
                     </label>
                   </div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="packaging_fee" className="block text-sm font-medium text-gray-700 mb-1">
+                    Packaging Fee ({settings.currency})
+                  </label>
+                  <input
+                    type="number"
+                    id="packaging_fee"
+                    name="packaging_fee"
+                    value={settings.packaging_fee === null ? '' : settings.packaging_fee}
+                    onChange={handleChange}
+                    step="0.01"
+                    min="0"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                  />
+                  <div className="mt-2 flex items-center">
+                    <input
+                      type="checkbox"
+                      id="packaging_fee_enabled"
+                      name="packaging_fee_enabled"
+                      checked={settings.packaging_fee_enabled || false}
+                      onChange={handleChange}
+                      className="h-4 w-4 text-black focus:ring-black border-gray-300 rounded"
+                    />
+                    <label htmlFor="packaging_fee_enabled" className="ml-2 text-sm text-gray-700">
+                      Enable Packaging Fee (Per Item)
+                    </label>
+                  </div>
+                  <p className="mt-1 text-xs text-gray-500">Charge per item when customer selects packaging</p>
                 </div>
               </div>
               

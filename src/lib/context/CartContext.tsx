@@ -9,6 +9,7 @@ interface CartItem {
   name: string;
   price: number;
   quantity: number;
+  packaging: boolean;
 }
 
 interface AppliedCoupon {
@@ -26,15 +27,17 @@ interface CartTotals {
   gst: number;
   platformFee: number;
   deliveryCharge: number;
+  packagingFee: number;
   discountAmount: number;
   finalTotal: number;
 }
 
 interface CartContextType {
   items: CartItem[];
-  addItem: (item: Omit<CartItem, 'quantity'>) => void;
+  addItem: (item: Omit<CartItem, 'quantity' | 'packaging'>) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
+  togglePackaging: (id: string) => void;
   clearCart: () => void;
   itemCount: number;
   calculateTotals: () => Promise<CartTotals>;
@@ -107,7 +110,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [appliedCoupon]);
 
-  const addItem = (newItem: Omit<CartItem, 'quantity'>) => {
+  const addItem = (newItem: Omit<CartItem, 'quantity' | 'packaging'>) => {
     setItems(currentItems => {
       const existingItem = currentItems.find(item => item.id === newItem.id);
       if (existingItem) {
@@ -117,7 +120,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             : item
         );
       }
-      return [...currentItems, { ...newItem, quantity: 1 }];
+      return [...currentItems, { ...newItem, quantity: 1, packaging: false }];
     });
   };
 
@@ -133,6 +136,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems(currentItems =>
       currentItems.map(item =>
         item.id === id ? { ...item, quantity } : item
+      )
+    );
+  };
+
+  const togglePackaging = (id: string) => {
+    setItems(currentItems =>
+      currentItems.map(item =>
+        item.id === id ? { ...item, packaging: !item.packaging } : item
       )
     );
   };
@@ -197,6 +208,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       // Platform fee from settings (if enabled)
       const platformFee = fees.platformFeeEnabled ? (Math.round((fees.platformFee || 0) * 100) / 100) : 0;
       
+      // Packaging fee calculation (per item with packaging enabled)
+      const packagingCount = items.reduce((count, item) => count + (item.packaging ? item.quantity : 0), 0);
+      const packagingFee = fees.packagingFeeEnabled ? (Math.round((fees.packagingFee || 0) * packagingCount * 100) / 100) : 0;
+      
       // No delivery charge as we only offer pickup
       const deliveryCharge = 0;
       
@@ -204,12 +219,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const discountAmount = appliedCoupon ? Math.round(appliedCoupon.discountAmount * 100) / 100 : 0;
       
       // Calculate final total
-      const finalTotal = Math.round(Math.max(0, itemTotal + gst + platformFee + deliveryCharge - discountAmount) * 100) / 100;
+      const finalTotal = Math.round(Math.max(0, itemTotal + gst + platformFee + packagingFee + deliveryCharge - discountAmount) * 100) / 100;
       
       return {
         itemTotal,
         gst,
         platformFee,
+        packagingFee,
         deliveryCharge,
         discountAmount,
         finalTotal
@@ -223,14 +239,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const itemTotal = Math.round(basePrice * 100) / 100;
       const gst = Math.round(gstAmount * 100) / 100;
       const platformFee = 0.00;
+      const packagingFee = 0.00;
       const deliveryCharge = 0;
       const discountAmount = appliedCoupon ? Math.round(appliedCoupon.discountAmount * 100) / 100 : 0;
-      const finalTotal = Math.round(Math.max(0, itemTotal + gst + platformFee + deliveryCharge - discountAmount) * 100) / 100;
+      const finalTotal = Math.round(Math.max(0, itemTotal + gst + platformFee + packagingFee + deliveryCharge - discountAmount) * 100) / 100;
       
       return {
         itemTotal,
         gst,
         platformFee,
+        packagingFee,
         deliveryCharge,
         discountAmount,
         finalTotal
@@ -265,6 +283,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         addItem,
         removeItem,
         updateQuantity,
+        togglePackaging,
         clearCart,
         itemCount,
         calculateTotals,

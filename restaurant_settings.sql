@@ -49,6 +49,16 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'restaurant_settings' AND column_name = 'is_open') THEN
         ALTER TABLE public.restaurant_settings ADD COLUMN is_open BOOLEAN DEFAULT true;
     END IF;
+    
+    -- Add packaging_fee column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'restaurant_settings' AND column_name = 'packaging_fee') THEN
+        ALTER TABLE public.restaurant_settings ADD COLUMN packaging_fee DECIMAL(10, 2) DEFAULT 0.00;
+    END IF;
+    
+    -- Add packaging_fee_enabled column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'restaurant_settings' AND column_name = 'packaging_fee_enabled') THEN
+        ALTER TABLE public.restaurant_settings ADD COLUMN packaging_fee_enabled BOOLEAN DEFAULT false;
+    END IF;
 END $$;
 
 -- Insert default settings row (only if table is empty)

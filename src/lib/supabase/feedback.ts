@@ -75,8 +75,10 @@ export async function getItemsFeedback(orderId: string) {
     .select('*')
     .eq('order_id', orderId);
 
-  if (error) throw error;
-  return data;
+  if (error) {
+    return [];
+  }
+  return data || [];
 }
 
 /**

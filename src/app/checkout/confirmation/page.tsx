@@ -15,6 +15,7 @@ interface OrderDetails {
   itemTotal: number;
   gst: number;
   platformFee: number;
+  packagingFee: number;
   deliveryCharge: number;
   discountAmount: number;
   finalTotal: number;
@@ -252,6 +253,12 @@ export default function CheckoutConfirmation() {
                     <span className="text-gray-600">Platform Fee</span>
                     <span>₹{order.platformFee.toFixed(2)}</span>
                   </div>
+                  {order.packagingFee > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Packaging Fee</span>
+                      <span>₹{order.packagingFee.toFixed(2)}</span>
+                    </div>
+                  )}
                   {order.deliveryCharge > 0 && (
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Delivery Charge</span>

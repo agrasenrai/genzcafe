@@ -59,7 +59,8 @@ export function formatOrderForKOT(order: any) {
     items: order.order_items.map((item: any) => ({
       name: item.name,
       quantity: item.quantity,
-      specialInstructions: undefined
+      specialInstructions: undefined,
+      packaging: item.packaging ?? false
     })),
     deliveryAddress: order.delivery_address,
     scheduledTime: scheduledTime
@@ -94,6 +95,7 @@ export function formatOrderForBill(order: any) {
     itemTotal: order.item_total,
     gst: order.gst,
     platformFee: order.platform_fee,
+    packagingFee: order.packaging_fee || 0,
     deliveryCharge: order.delivery_charge,
     finalTotal: order.final_total,
     paymentMethod: order.payment_method === 'card' ? 'Card Payment' : 'Cash',

@@ -22,6 +22,7 @@ interface BillData {
   itemTotal: number;
   gst: number;
   platformFee: number;
+  packagingFee: number;
   deliveryCharge: number;
   finalTotal: number;
   paymentMethod: string;
@@ -314,6 +315,12 @@ export function generateBillHTML(data: BillData): string {
             <span class="total-amount">₹${data.platformFee.toFixed(2)}</span>
           </div>
           ` : ''}
+          ${data.packagingFee > 0 ? `
+          <div class="total-row">
+            <span class="total-label">Packaging:</span>
+            <span class="total-amount">₹${data.packagingFee.toFixed(2)}</span>
+          </div>
+          ` : ''}
           ${data.deliveryCharge > 0 ? `
           <div class="total-row">
             <span class="total-label">Delivery:</span>
@@ -368,7 +375,15 @@ export function printBill(data: BillData): void {
     printWindow.document.close();
     
     printWindow.onload = () => {
-      printWindow.print();
+      if (printWindow.closed) return;
+      try {
+        printWindow.focus();
+      } catch {
+        // Ignore focus errors on some browsers.
+      }
+      if (!printWindow.closed) {
+        printWindow.print();
+      }
     };
   } else {
     alert('Please allow popups to print bill');
@@ -388,12 +403,32 @@ export function printBillAutomatically(data: BillData): void {
     printWindow.document.close();
     
     printWindow.onload = () => {
-      setTimeout(() => {
-        printWindow.print();
-        // Close window after printing
-        setTimeout(() => {
+      if (printWindow.closed) return;
+      try {
+        printWindow.focus();
+      } catch {
+        // Ignore focus errors on some browsers.
+      }
+
+      const safeClose = () => {
+        if (!printWindow.closed) {
           printWindow.close();
-        }, 1000);
+        }
+      };
+
+      // Prefer close after print event when supported.
+      try {
+        printWindow.onafterprint = safeClose;
+      } catch {
+        // Ignore if onafterprint is not assignable.
+      }
+
+      setTimeout(() => {
+        if (!printWindow.closed) {
+          printWindow.print();
+        }
+        // Fallback close in case onafterprint does not fire.
+        setTimeout(safeClose, 1000);
       }, 300);
     };
   }

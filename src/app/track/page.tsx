@@ -193,8 +193,8 @@ function TrackOrderContent() {
     return statusMap[status] || { text: status, color: 'bg-gray-100 text-gray-700' };
   };
 
-  // Check if order is delivered and can be rated
-  const canLeaveFeedback = order?.status === 'delivered';
+  // Allow feedback when order is ready for pickup
+  const canLeaveFeedback = order?.status === 'ready';
 
   return (
     <div className="fixed inset-0 w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto bg-[#FFFDF7] overflow-hidden flex flex-col">

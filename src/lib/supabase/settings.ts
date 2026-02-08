@@ -18,6 +18,8 @@ export interface RestaurantSettings {
   tax_rate: number | null;
   platform_fee: number | null;
   platform_fee_enabled: boolean;
+  packaging_fee: number | null;
+  packaging_fee_enabled: boolean;
   is_open: boolean;
   accept_credit_cards: boolean;
   accept_cash: boolean;
@@ -219,9 +221,14 @@ export async function getPlatformFees() {
     const platformFee = settings?.platform_fee;
     const validPlatformFee = (typeof platformFee === 'number' && platformFee >= 0) ? platformFee : 15.00;
     
+    const packagingFee = settings?.packaging_fee;
+    const validPackagingFee = (typeof packagingFee === 'number' && packagingFee >= 0) ? packagingFee : 0.00;
+    
     const result = {
       platformFee: validPlatformFee,
       platformFeeEnabled: settings?.platform_fee_enabled ?? true,
+      packagingFee: validPackagingFee,
+      packagingFeeEnabled: settings?.packaging_fee_enabled ?? false,
       deliveryCharge: settings?.delivery_fee || 40.00,
       freeDeliveryThreshold: settings?.minimum_order_amount || 500.00,
       gstRate: gstRate
@@ -237,6 +244,8 @@ export async function getPlatformFees() {
     return {
       platformFee: 15.00,
       platformFeeEnabled: true,
+      packagingFee: 0.00,
+      packagingFeeEnabled: false,
       deliveryCharge: 40.00,
       freeDeliveryThreshold: 500.00,
       gstRate: 0.05 // 5%

@@ -8,6 +8,7 @@ import { formatPrice } from '@/lib/utils/helpers';
 import { printMultipleKOTs } from '@/lib/utils/kotGenerator';
 import { printBillAutomatically } from '@/lib/utils/billGenerator';
 import { formatOrderForKOT, formatOrderForBill } from '@/lib/supabase/kotService';
+import { getPlatformFees } from '@/lib/supabase/settings';
 
 interface MenuItem {
   id: string;
@@ -21,6 +22,7 @@ interface MenuItem {
 
 interface CartItem extends MenuItem {
   quantity: number;
+  packaging: boolean;
 }
 
 interface Category {
@@ -39,10 +41,25 @@ export default function CounterBookingPage() {
   const [printMessage, setPrintMessage] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [lastOrder, setLastOrder] = useState<any>(null);
+  const [feeSettings, setFeeSettings] = useState({
+    gstRate: 0.05,
+    packagingFee: 0,
+    packagingFeeEnabled: false
+  });
 
   useEffect(() => {
     fetchCategories();
     fetchMenuItems();
+  }, []);
+
+  useEffect(() => {
+    getPlatformFees().then(fees => {
+      setFeeSettings({
+        gstRate: fees.gstRate ?? 0.05,
+        packagingFee: fees.packagingFee ?? 0,
+        packagingFeeEnabled: fees.packagingFeeEnabled ?? false
+      });
+    });
   }, []);
 
   const fetchCategories = async () => {
@@ -101,7 +118,7 @@ export default function CounterBookingPage() {
         i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
       ));
     } else {
-      setCart([...cart, { ...item, quantity: 1 }]);
+      setCart([...cart, { ...item, quantity: 1, packaging: false }]);
     }
   };
 
@@ -119,6 +136,12 @@ export default function CounterBookingPage() {
     setCart(cart.filter(i => i.id !== itemId));
   };
 
+  const togglePackaging = (itemId: string) => {
+    setCart(cart.map(i =>
+      i.id === itemId ? { ...i, packaging: !i.packaging } : i
+    ));
+  };
+
   const clearCart = () => {
     setCart([]);
     setCustomerName('Counter');
@@ -127,11 +150,15 @@ export default function CounterBookingPage() {
   const calculateTotal = () => {
     // Prices are GST-inclusive. Compute item total excluding GST, GST amount, and final (gross) total.
     const gross = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const gstRate = 0.05;
+    const gstRate = feeSettings.gstRate || 0.05;
     const itemTotal = Number((gross / (1 + gstRate)).toFixed(2)); // excluding GST
     const gst = Number((gross - itemTotal).toFixed(2)); // total GST amount
-    const finalTotal = Number(gross.toFixed(2)); // gross (inclusive)
-    return { itemTotal, gst, finalTotal };
+    const packagingCount = cart.reduce((count, item) => count + (item.packaging ? item.quantity : 0), 0);
+    const packagingFee = feeSettings.packagingFeeEnabled
+      ? Number((feeSettings.packagingFee * packagingCount).toFixed(2))
+      : 0;
+    const finalTotal = Number((gross + packagingFee).toFixed(2)); // gross + packaging
+    return { itemTotal, gst, packagingFee, finalTotal };
   };
 
   const placeOrder = async () => {
@@ -143,7 +170,7 @@ export default function CounterBookingPage() {
 
     setLoading(true);
     try {
-      const { itemTotal, gst, finalTotal } = calculateTotal();
+      const { itemTotal, gst, packagingFee, finalTotal } = calculateTotal();
       const otp = Math.floor(1000 + Math.random() * 9000).toString();
       
       // Create order with counter defaults
@@ -157,10 +184,11 @@ export default function CounterBookingPage() {
           delivery_address: 'Counter',
           scheduled_time: new Date().toISOString(),
           payment_method: 'cash',
-          payment_status: 'pending',
+          payment_status: 'completed',
           item_total: itemTotal,
           gst: gst,
           platform_fee: 0,
+          packaging_fee: packagingFee,
           delivery_charge: 0,
           final_total: finalTotal,
           otp: otp,
@@ -177,7 +205,8 @@ export default function CounterBookingPage() {
         menu_item_id: item.id,
         name: item.name,
         quantity: item.quantity,
-        price: item.price
+        price: item.price,
+        packaging: item.packaging ?? false
       }));
 
       const { error: itemsError } = await supabase
@@ -196,7 +225,8 @@ export default function CounterBookingPage() {
             name,
             quantity,
             price,
-            menu_item_id
+            menu_item_id,
+            packaging
           )
         `)
         .eq('id', order.id)
@@ -235,7 +265,7 @@ export default function CounterBookingPage() {
     }
   };
 
-  const { itemTotal, gst, finalTotal } = calculateTotal();
+  const { itemTotal, gst, packagingFee, finalTotal } = calculateTotal();
 
   useEffect(() => {
     if (searchParams?.get('fullscreen') === '1') {
@@ -425,34 +455,48 @@ export default function CounterBookingPage() {
                 ) : (
                   <div className="space-y-3">
                     {cart.map(item => (
-                      <div key={item.id} className="flex items-center gap-2 p-2 bg-gradient-to-r from-orange-50 to-amber-50 rounded-md border border-orange-200">
-                        <div className="flex-1">
-                          <p className="font-semibold text-sm text-gray-800">{item.name}</p>
-                          <p className="text-xs text-orange-600 font-semibold">{formatPrice(item.price)}</p>
-                        </div>
+                      <div key={item.id} className="p-2 bg-gradient-to-r from-orange-50 to-amber-50 rounded-md border border-orange-200">
                         <div className="flex items-center gap-2">
+                          <div className="flex-1">
+                            <p className="font-semibold text-sm text-gray-800">{item.name}</p>
+                            <p className="text-xs text-orange-600 font-semibold">{formatPrice(item.price)}</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              className="w-6 h-6 bg-orange-500 hover:bg-orange-600 text-white rounded text-sm font-bold"
+                            >
+                              -
+                            </button>
+                            <span className="w-7 text-center font-bold text-sm">{item.quantity}</span>
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              className="w-6 h-6 bg-orange-500 hover:bg-orange-600 text-white rounded text-sm font-bold"
+                            >
+                              +
+                            </button>
+                          </div>
                           <button
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            className="w-6 h-6 bg-orange-500 hover:bg-orange-600 text-white rounded text-sm font-bold"
+                            onClick={() => removeFromCart(item.id)}
+                            className="text-red-500 hover:text-red-700 p-1"
                           >
-                            -
-                          </button>
-                          <span className="w-7 text-center font-bold text-sm">{item.quantity}</span>
-                          <button
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="w-6 h-6 bg-orange-500 hover:bg-orange-600 text-white rounded text-sm font-bold"
-                          >
-                            +
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
                           </button>
                         </div>
-                        <button
-                          onClick={() => removeFromCart(item.id)}
-                          className="text-red-500 hover:text-red-700 p-1"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
+                        <div className="mt-2 flex items-center">
+                          <input
+                            type="checkbox"
+                            id={`counter-packaging-${item.id}`}
+                            checked={item.packaging || false}
+                            onChange={() => togglePackaging(item.id)}
+                            className="h-3 w-3 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor={`counter-packaging-${item.id}`} className="ml-2 text-xs text-gray-600">
+                            Add Packaging
+                          </label>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -466,9 +510,15 @@ export default function CounterBookingPage() {
                   <span className="font-semibold text-gray-900">{formatPrice(itemTotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm font-medium">
-                  <span className="text-gray-700">GST (5%):</span>
+                  <span className="text-gray-700">GST ({Math.round((feeSettings.gstRate || 0.05) * 100)}%):</span>
                   <span className="font-semibold text-gray-900">{formatPrice(gst)}</span>
                 </div>
+                {packagingFee > 0 && (
+                  <div className="flex justify-between text-sm font-medium">
+                    <span className="text-gray-700">Packaging Fee:</span>
+                    <span className="font-semibold text-gray-900">{formatPrice(packagingFee)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-lg font-bold border-t border-orange-300 pt-2">
                   <span className="text-gray-900">Total:</span>
                   <span className="text-orange-600">{formatPrice(finalTotal)}</span>
@@ -522,10 +572,11 @@ export default function CounterBookingPage() {
                         item_total: totals.itemTotal,
                         gst: totals.gst,
                         platform_fee: 0,
+                        packaging_fee: totals.packagingFee,
                         delivery_charge: 0,
                         final_total: totals.finalTotal,
                         payment_method: 'cash',
-                        payment_status: 'pending'
+                        payment_status: 'completed'
                       };
 
                       const billData = formatOrderForBill(orderLike);
