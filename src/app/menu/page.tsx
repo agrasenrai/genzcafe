@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useCart } from '@/lib/context/CartContext';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { getAllMenuItems } from '@/lib/supabase/menu';
 interface MenuItem {
   id: string;
@@ -23,6 +23,25 @@ interface MenuItem {
     name: string;
   };
 }
+
+const normalizeSearchText = (value: string) =>
+  value
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+
+const tokenizeSearch = (value: string) =>
+  normalizeSearchText(value)
+    .split(' ')
+    .filter(Boolean);
+
+const matchesToken = (token: string, text: string, words: string[]) => {
+  if (text.includes(token)) return true;
+  if (token.length >= 3 && words.some(word => word.startsWith(token))) return true;
+  return false;
+};
 
 export default function MenuPage() {
   const { addItem, itemCount, updateQuantity, items: cartItems } = useCart();
@@ -72,17 +91,53 @@ export default function MenuPage() {
   // Get unique categories from the menu items
   const categories = Array.from(new Set(menuItems.map(item => item.menu_categories.name)));
 
-  // Filter menu items based on selected category, veg filter, and search term
-  const filteredItems = menuItems.filter(item => {
-    const matchesCategory = selectedCategory ? item.menu_categories.name === selectedCategory : true;
-    const matchesVegFilter = isVegOnly ? item.is_veg : true;
-    const matchesSearch = searchTerm 
-      ? item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchTerm.toLowerCase())
-      : true;
-    
-    return matchesCategory && matchesVegFilter && matchesSearch;
-  });
+  const filteredItems = useMemo(() => {
+    const trimmedSearch = searchTerm.trim();
+    const tokens = trimmedSearch ? tokenizeSearch(trimmedSearch) : [];
+
+    return menuItems
+      .map((item, index) => {
+        const matchesCategory = selectedCategory ? item.menu_categories.name === selectedCategory : true;
+        const matchesVegFilter = isVegOnly ? item.is_veg : true;
+
+        if (!matchesCategory || !matchesVegFilter) {
+          return { item, index, score: -1, matchesSearch: false };
+        }
+
+        if (tokens.length === 0) {
+          return { item, index, score: 0, matchesSearch: true };
+        }
+
+        const nameText = normalizeSearchText(item.name);
+        const descriptionText = normalizeSearchText(item.description || '');
+        const categoryText = normalizeSearchText(item.menu_categories.name || '');
+        const nameWords = nameText.split(' ').filter(Boolean);
+        const descriptionWords = descriptionText.split(' ').filter(Boolean);
+        const categoryWords = categoryText.split(' ').filter(Boolean);
+
+        let score = 0;
+        const matchesAllTokens = tokens.every(token => {
+          const inName = matchesToken(token, nameText, nameWords);
+          const inCategory = matchesToken(token, categoryText, categoryWords);
+          const inDescription = matchesToken(token, descriptionText, descriptionWords);
+
+          if (inName) score += 3;
+          if (inCategory) score += 2;
+          if (inDescription) score += 1;
+
+          return inName || inCategory || inDescription;
+        });
+
+        return { item, index, score, matchesSearch: matchesAllTokens };
+      })
+      .filter(({ matchesSearch }) => matchesSearch)
+      .sort((a, b) => {
+        if (tokens.length === 0) return a.index - b.index;
+        if (b.score !== a.score) return b.score - a.score;
+        return a.index - b.index;
+      })
+      .map(({ item }) => item);
+  }, [menuItems, selectedCategory, isVegOnly, searchTerm]);
 
   // Group items by category for display
   const itemsByCategory: Record<string, MenuItem[]> = {};

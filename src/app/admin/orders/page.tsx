@@ -66,6 +66,7 @@ export default function OrdersPage() {
   const [statusFilter, setStatusFilter] = useState('active');
   const [locationFilter, setLocationFilter] = useState<'all' | 'takeaway' | 'delivery'>('all');
   const [sortBy, setSortBy] = useState('newest');
+  const [searchTerm, setSearchTerm] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<OrderWithFeedback | null>(null);
   const [updatingStatus, setUpdatingStatus] = useState(false);
@@ -214,6 +215,29 @@ export default function OrdersPage() {
       return order.delivery_address && order.delivery_address.toLowerCase().includes('take');
     } else if (locationFilter === 'delivery') {
       return order.delivery_address && !order.delivery_address.toLowerCase().includes('take');
+    }
+
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+    if (normalizedSearch) {
+      const fields = [
+        order.otp,
+        order.customer_name,
+        order.customer_phone,
+        order.customer_email ?? '',
+        order.delivery_address ?? '',
+        order.payment_method,
+        order.status
+      ];
+      const matchesFields = fields.some(field =>
+        String(field ?? '').toLowerCase().includes(normalizedSearch)
+      );
+      const matchesItems = order.order_items.some(item =>
+        item.name.toLowerCase().includes(normalizedSearch)
+      );
+
+      if (!matchesFields && !matchesItems) {
+        return false;
+      }
     }
 
     return true;
@@ -450,6 +474,32 @@ export default function OrdersPage() {
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-5v4m0-4h-4m4 0l-5 5M4 20v-4m0 4h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
                   </svg>
+                </button>
+              )}
+            </div>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search orders by name, phone, OTP, item, or status"
+                  className="w-full pl-10 pr-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                  aria-label="Search orders"
+                />
+                <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                  <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+              </div>
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={() => setSearchTerm('')}
+                  className="px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                >
+                  Clear
                 </button>
               )}
             </div>
