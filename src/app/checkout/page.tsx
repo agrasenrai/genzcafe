@@ -57,6 +57,8 @@ export default function CheckoutPage() {
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   
   // Delivery points state
   const [deliveryPoints, setDeliveryPoints] = useState<Array<{name: string; address: string; phone?: string}>>([]);
@@ -168,6 +170,25 @@ export default function CheckoutPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isProcessing) return;
+    
+    // Validate customer name and phone
+    let hasError = false;
+    
+    if (customerName.trim().length < 3) {
+      setNameError('Name must be at least 3 characters');
+      hasError = true;
+    } else {
+      setNameError(null);
+    }
+    
+    if (!/^(\d{10}|\+91\d{10}|0\d{10})$/.test(customerPhone)) {
+      setPhoneError('Phone number must be 10 digits, +91 followed by 10 digits, or 0 followed by 10 digits');
+      hasError = true;
+    } else {
+      setPhoneError(null);
+    }
+    
+    if (hasError) return;
     
     setIsProcessing(true);
     setOrderError(null);
@@ -358,9 +379,12 @@ export default function CheckoutPage() {
                   required
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-20 focus:border-yellow-300 bg-white focus:bg-yellow-50 text-sm transition-all duration-200 hover:border-gray-300 font-light"
+                  className={`w-full px-3 py-2.5 rounded-lg border focus:ring-2 focus:ring-opacity-20 focus:border-yellow-300 bg-white focus:bg-yellow-50 text-sm transition-all duration-200 hover:border-gray-300 font-light ${
+                    nameError ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-yellow-500'
+                  }`}
                   placeholder="Your name"
                 />
+                {nameError && <p className="text-xs text-red-500 mt-1">{nameError}</p>}
               </div>
               
               <div>
@@ -373,9 +397,12 @@ export default function CheckoutPage() {
                   required
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-20 focus:border-yellow-300 bg-white focus:bg-yellow-50 text-sm transition-all duration-200 hover:border-gray-300 font-light"
+                  className={`w-full px-3 py-2.5 rounded-lg border focus:ring-2 focus:ring-opacity-20 focus:border-yellow-300 bg-white focus:bg-yellow-50 text-sm transition-all duration-200 hover:border-gray-300 font-light ${
+                    phoneError ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 focus:ring-yellow-500'
+                  }`}
                   placeholder="Your phone number"
                 />
+                {phoneError && <p className="text-xs text-red-500 mt-1">{phoneError}</p>}
               </div>
             </div>
           </div>
