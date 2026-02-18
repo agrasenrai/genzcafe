@@ -3,6 +3,7 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { NotificationProvider } from '@/lib/context/NotificationContext';
 import { 
   Bars3Icon, 
   XMarkIcon, 
@@ -108,111 +109,113 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   // Admin dashboard layout
   return (
-    <div className="min-h-screen flex">
-      {/* Sidebar */}
-      <div className="bg-gray-800 text-white w-64 flex-shrink-0">
-        <div className="p-4">
-          <h1 className="text-xl font-bold">Admin Dashboard</h1>
-          <p className="text-sm text-gray-300 mt-1">Welcome, {adminUser?.username}</p>
-        </div>
-        <nav className="mt-6">
-          <ul className="space-y-1">
-            <li>
-              <Link 
-                href="/admin" 
-                className={`block px-4 py-2 hover:bg-gray-700 ${pathname === '/admin' ? 'bg-gray-700' : ''}`}
-              >
-                Dashboard
-              </Link>
-            </li>
-            <li>
-              <Link 
-                href="/admin/orders" 
-                className={`block px-4 py-2 hover:bg-gray-700 ${pathname?.startsWith('/admin/orders') ? 'bg-gray-700' : ''}`}
-              >
-                Orders
-              </Link>
-            </li>
-            <li>
-              <Link 
-                href="/admin/counter" 
-                className={`block px-4 py-2 hover:bg-gray-700 ${pathname?.startsWith('/admin/counter') ? 'bg-gray-700' : ''}`}
-              >
-                Counter Booking (POS)
-              </Link>
-            </li>
-            <li>
-              <Link 
-                href="/admin/menu" 
-                className={`block px-4 py-2 hover:bg-gray-700 ${pathname?.startsWith('/admin/menu') ? 'bg-gray-700' : ''}`}
-              >
-                Menu
-              </Link>
-            </li>
-            <li>
-              <Link 
-                href="/admin/categories" 
-                className={`block px-4 py-2 hover:bg-gray-700 ${pathname?.startsWith('/admin/categories') ? 'bg-gray-700' : ''}`}
-              >
-                Categories
-              </Link>
-            </li>
-            <li>
-              <Link 
-                href="/admin/users" 
-                className={`block px-4 py-2 hover:bg-gray-700 ${pathname?.startsWith('/admin/users') ? 'bg-gray-700' : ''}`}
-              >
-                Users
-              </Link>
-            </li>
-            <li>
-              <Link 
-                href="/admin/coupons" 
-                className={`block px-4 py-2 hover:bg-gray-700 ${pathname?.startsWith('/admin/coupons') ? 'bg-gray-700' : ''}`}
-              >
-                Coupons
-              </Link>
-            </li>
-            <li>
-              <Link 
-                href="/admin/settings" 
-                className={`block px-4 py-2 hover:bg-gray-700 ${pathname?.startsWith('/admin/settings') ? 'bg-gray-700' : ''}`}
-              >
-                Restaurant Settings
-              </Link>
-            </li>
-            <li>
-              <button 
-                onClick={handleLogout}
-                className="block w-full text-left px-4 py-2 hover:bg-gray-700 text-gray-300"
-              >
-                Logout
-              </button>
-            </li>
-          </ul>
-        </nav>
-      </div>
-
-      {/* Main content */}
-      <div className="flex-1 overflow-auto">
-        <header className="bg-white shadow-sm">
-          <div className="px-4 py-4 flex items-center justify-between">
-            <h1 className="text-lg font-semibold text-gray-900">
-              {pathname === '/admin' && 'Dashboard'}
-              {pathname === '/admin/orders' && 'Orders'}
-              {pathname === '/admin/counter' && 'Counter Booking (POS)'}
-              {pathname === '/admin/menu' && 'Menu Management'}
-              {pathname === '/admin/categories' && 'Categories Management'}
-              {pathname === '/admin/users' && 'User Management'}
-              {pathname?.startsWith('/admin/coupons') && 'Coupon Management'}
-              {pathname?.startsWith('/admin/settings') && 'Restaurant Settings'}
-            </h1>
+    <NotificationProvider>
+      <div className="min-h-screen flex">
+        {/* Sidebar */}
+        <div className="bg-gray-800 text-white w-64 flex-shrink-0">
+          <div className="p-4">
+            <h1 className="text-xl font-bold">Admin Dashboard</h1>
+            <p className="text-sm text-gray-300 mt-1">Welcome, {adminUser?.username}</p>
           </div>
-        </header>
-        <main className="p-6">
-          {children}
-        </main>
+          <nav className="mt-6">
+            <ul className="space-y-1">
+              <li>
+                <Link 
+                  href="/admin" 
+                  className={`block px-4 py-2 hover:bg-gray-700 ${pathname === '/admin' ? 'bg-gray-700' : ''}`}
+                >
+                  Dashboard
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  href="/admin/orders" 
+                  className={`block px-4 py-2 hover:bg-gray-700 ${pathname?.startsWith('/admin/orders') ? 'bg-gray-700' : ''}`}
+                >
+                  Orders
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  href="/admin/counter" 
+                  className={`block px-4 py-2 hover:bg-gray-700 ${pathname?.startsWith('/admin/counter') ? 'bg-gray-700' : ''}`}
+                >
+                  Counter Booking (POS)
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  href="/admin/menu" 
+                  className={`block px-4 py-2 hover:bg-gray-700 ${pathname?.startsWith('/admin/menu') ? 'bg-gray-700' : ''}`}
+                >
+                  Menu
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  href="/admin/categories" 
+                  className={`block px-4 py-2 hover:bg-gray-700 ${pathname?.startsWith('/admin/categories') ? 'bg-gray-700' : ''}`}
+                >
+                  Categories
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  href="/admin/users" 
+                  className={`block px-4 py-2 hover:bg-gray-700 ${pathname?.startsWith('/admin/users') ? 'bg-gray-700' : ''}`}
+                >
+                  Users
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  href="/admin/coupons" 
+                  className={`block px-4 py-2 hover:bg-gray-700 ${pathname?.startsWith('/admin/coupons') ? 'bg-gray-700' : ''}`}
+                >
+                  Coupons
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  href="/admin/settings" 
+                  className={`block px-4 py-2 hover:bg-gray-700 ${pathname?.startsWith('/admin/settings') ? 'bg-gray-700' : ''}`}
+                >
+                  Restaurant Settings
+                </Link>
+              </li>
+              <li>
+                <button 
+                  onClick={handleLogout}
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-700 text-gray-300"
+                >
+                  Logout
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+
+        {/* Main content */}
+        <div className="flex-1 overflow-auto">
+          <header className="bg-white shadow-sm">
+            <div className="px-4 py-4 flex items-center justify-between">
+              <h1 className="text-lg font-semibold text-gray-900">
+                {pathname === '/admin' && 'Dashboard'}
+                {pathname === '/admin/orders' && 'Orders'}
+                {pathname === '/admin/counter' && 'Counter Booking (POS)'}
+                {pathname === '/admin/menu' && 'Menu Management'}
+                {pathname === '/admin/categories' && 'Categories Management'}
+                {pathname === '/admin/users' && 'User Management'}
+                {pathname?.startsWith('/admin/coupons') && 'Coupon Management'}
+                {pathname?.startsWith('/admin/settings') && 'Restaurant Settings'}
+              </h1>
+            </div>
+          </header>
+          <main className="p-6">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </NotificationProvider>
   );
 } 

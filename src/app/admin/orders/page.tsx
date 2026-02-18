@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { playNotificationSound } from '@/lib/utils/notificationSound';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import { updateOrderStatus } from '@/lib/supabase/orders';
@@ -55,9 +54,7 @@ interface OrderWithFeedback extends Order {
     comment?: string;
   }> | null;
 }
-//redpployment test
-//redd
-//redddd
+
 export default function OrdersPage() {
   const searchParams = useSearchParams();
   const [orders, setOrders] = useState<OrderWithFeedback[]>([]);
@@ -73,10 +70,6 @@ export default function OrdersPage() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [printMessage, setPrintMessage] = useState<string | null>(null);
   const printMessageTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  // Notification state
-  const prevOrderIdsRef = useRef<Set<string>>(new Set());
-  const [showNewOrderAlert, setShowNewOrderAlert] = useState(false);
-  const alertTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchOrders = useCallback(async () => {
     setLoading(true);
@@ -169,33 +162,8 @@ export default function OrdersPage() {
     // Cleanup subscription on component unmount
     return () => {
       subscription.unsubscribe();
-      if (alertTimeoutRef.current) clearTimeout(alertTimeoutRef.current);
     };
   }, [fetchOrders]);
-
-  // Detect new pending orders and play sound
-  useEffect(() => {
-    if (loading) return;
-    const currentPending = orders.filter(o => o.status === 'pending');
-    const currentIds = new Set(currentPending.map(o => o.id));
-    const prevIds = prevOrderIdsRef.current;
-
-    // Only play sound for new pending orders (not for status changes or refresh)
-    let newOrderDetected = false;
-    for (const id of currentIds) {
-      if (!prevIds.has(id)) {
-        newOrderDetected = true;
-        break;
-      }
-    }
-    if (newOrderDetected && currentPending.length > 0) {
-      playNotificationSound();
-      setShowNewOrderAlert(true);
-      if (alertTimeoutRef.current) clearTimeout(alertTimeoutRef.current);
-      alertTimeoutRef.current = setTimeout(() => setShowNewOrderAlert(false), 2500);
-    }
-    prevOrderIdsRef.current = currentIds;
-  }, [orders, loading]);
 
   // Filter orders by status
   const filteredOrders = orders.filter(order => {
@@ -329,13 +297,6 @@ export default function OrdersPage() {
 
   return (
     <div className="p-6 relative">
-      {/* Visual Alert for New Order */}
-      {showNewOrderAlert && (
-        <div className="fixed top-6 right-6 z-50 flex items-center gap-2 bg-yellow-200 text-yellow-900 px-4 py-2 rounded shadow-lg animate-bounce">
-          <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" /></svg>
-          <span className="font-semibold">New Order Received!</span>
-        </div>
-      )}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Order Management</h1>
         <p className="text-gray-600">Manage your restaurant orders</p>
