@@ -12,7 +12,7 @@ interface Order {
   created_at: string;
   order_type: 'pickup' | 'delivery';
   scheduled_time: string;
-  payment_method: 'card' | 'cash';
+  payment_method: 'card' | 'cash' | 'upi';
   final_total: number;
   status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'out_for_delivery' | 'delivered' | 'cancelled';
   otp: string;
@@ -158,7 +158,9 @@ export default function UserOrdersPage({ params }: PageProps) {
                 <div>
                   <p className="text-sm">
                     <span className="text-gray-600">Payment:</span>{' '}
-                    <span className="font-medium">{order.payment_method === 'card' ? 'Card' : 'Cash'}</span>
+                    <span className="font-medium">
+                      {order.payment_method === 'card' ? 'Card' : order.payment_method === 'upi' ? 'UPI' : 'Cash'}
+                    </span>
                   </p>
                   <p className="text-sm">
                     <span className="text-gray-600">Scheduled:</span>{' '}

@@ -98,7 +98,7 @@ export function formatOrderForBill(order: any) {
     packagingFee: order.packaging_fee || 0,
     deliveryCharge: order.delivery_charge,
     finalTotal: order.final_total,
-    paymentMethod: order.payment_method === 'card' ? 'Card Payment' : 'Cash',
+    paymentMethod: order.payment_method === 'card' ? 'Card Payment' : order.payment_method === 'upi' ? 'UPI' : 'Cash',
     paymentStatus: order.payment_status
   };
 }

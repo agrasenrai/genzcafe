@@ -17,7 +17,7 @@ export interface OrderData {
   order_type: 'pickup';  // Only pickup is available
   delivery_address: string | null;  // Pickup point address
   scheduled_time: string;
-  payment_method: 'card' | 'cash';
+  payment_method: 'card' | 'cash' | 'upi';
   item_total: number;
   gst: number;
   platform_fee: number;
@@ -195,6 +195,25 @@ export async function updateOrderStatus(orderId: string, status: 'pending' | 'co
     return true;
   } catch (error) {
     console.error('Error updating order status:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update payment method for an order
+ */
+export async function updateOrderPaymentMethod(orderId: string, paymentMethod: 'card' | 'cash' | 'upi') {
+  try {
+    const { error } = await supabase
+      .from('orders')
+      .update({ payment_method: paymentMethod })
+      .eq('id', orderId);
+
+    if (error) throw error;
+    
+    return true;
+  } catch (error) {
+    console.error('Error updating payment method:', error);
     throw error;
   }
 }

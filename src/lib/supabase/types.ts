@@ -121,7 +121,7 @@ export interface Database {
           order_type: 'pickup' | 'delivery'
           delivery_address: string | null
           scheduled_time: string
-          payment_method: 'card' | 'cash'
+          payment_method: 'card' | 'cash' | 'upi'
           item_total: number
           gst: number
           platform_fee: number
@@ -141,7 +141,7 @@ export interface Database {
           order_type: 'pickup' | 'delivery'
           delivery_address?: string | null
           scheduled_time: string
-          payment_method: 'card' | 'cash'
+          payment_method: 'card' | 'cash' | 'upi'
           item_total: number
           gst: number
           platform_fee: number
@@ -161,7 +161,7 @@ export interface Database {
           order_type?: 'pickup' | 'delivery'
           delivery_address?: string | null
           scheduled_time?: string
-          payment_method?: 'card' | 'cash'
+          payment_method?: 'card' | 'cash' | 'upi'
           item_total?: number
           gst?: number
           platform_fee?: number

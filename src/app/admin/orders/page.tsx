@@ -4,12 +4,13 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
-import { updateOrderStatus } from '@/lib/supabase/orders';
+import { updateOrderStatus, updateOrderPaymentMethod } from '@/lib/supabase/orders';
 import { formatPrice, formatDate, formatTime } from '@/lib/utils/helpers';
 import { getOrderFeedback, getItemsFeedback } from '@/lib/supabase/feedback';
 import { printMultipleKOTs } from '@/lib/utils/kotGenerator';
 import { printBill as printBillDocument, printBillAutomatically } from '@/lib/utils/billGenerator';
 import { getOrderForKOT, formatOrderForKOT, formatOrderForBill } from '@/lib/supabase/kotService';
+import PaymentModeDialog from '@/components/PaymentModeDialog';
 
 interface OrderItem {
   id: string;
@@ -30,7 +31,7 @@ interface Order {
   order_type: 'pickup' | 'delivery';
   delivery_address: string | null;
   scheduled_time: string;
-  payment_method: 'card' | 'cash';
+  payment_method: 'card' | 'cash' | 'upi';
   payment_id?: string;
   payment_status?: string;
   item_total: number;
@@ -70,6 +71,9 @@ export default function OrdersPage() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [printMessage, setPrintMessage] = useState<string | null>(null);
   const printMessageTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [pendingOrderForPayment, setPendingOrderForPayment] = useState<string | null>(null);
+  const [paymentDialogLoading, setPaymentDialogLoading] = useState(false);
 
   const fetchOrders = useCallback(async () => {
     setLoading(true);
@@ -215,6 +219,13 @@ export default function OrdersPage() {
   type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'out_for_delivery' | 'delivered' | 'cancelled' | 'awaiting_payment';
   
   const handleStatusUpdate = async (orderId: string, newStatus: OrderStatus) => {
+    // If confirming an order, show payment dialog instead of immediately updating
+    if (newStatus === 'confirmed') {
+      setPendingOrderForPayment(orderId);
+      setShowPaymentDialog(true);
+      return;
+    }
+
     try {
       setUpdatingStatus(true);
       await updateOrderStatus(orderId, newStatus);
@@ -227,27 +238,63 @@ export default function OrdersPage() {
       if (selectedOrder && selectedOrder.id === orderId) {
         setSelectedOrder({ ...selectedOrder, status: newStatus });
       }
-
-      // Auto-print KOT when order is confirmed
-      if (newStatus === 'confirmed') {
-        try {
-          const order = await getOrderForKOT(orderId);
-          const kotData = formatOrderForKOT(order);
-          
-          // Print 2 KOTs automatically
-          setTimeout(() => {
-            printMultipleKOTs(kotData, 2);
-          }, 500);
-        } catch (kotError) {
-          console.error('Error printing KOT:', kotError);
-          // Don't fail the status update if KOT printing fails
-        }
-      }
     } catch (err: any) {
       console.error('Error updating order status:', err);
       alert(`Failed to update status: ${err.message}`);
     } finally {
       setUpdatingStatus(false);
+    }
+  };
+
+  // Handle payment mode selection and proceed with confirmation
+  const handlePaymentModeSelect = async (paymentMethod: 'cash' | 'upi' | 'card') => {
+    if (!pendingOrderForPayment) return;
+
+    try {
+      setPaymentDialogLoading(true);
+      
+      // Update payment method in database
+      await updateOrderPaymentMethod(pendingOrderForPayment, paymentMethod);
+      
+      // Update status to confirmed
+      await updateOrderStatus(pendingOrderForPayment, 'confirmed');
+      
+      // Update local state
+      setOrders(orders.map(order => 
+        order.id === pendingOrderForPayment 
+          ? { ...order, status: 'confirmed', payment_method: paymentMethod } 
+          : order
+      ));
+      
+      if (selectedOrder && selectedOrder.id === pendingOrderForPayment) {
+        setSelectedOrder({ ...selectedOrder, status: 'confirmed', payment_method: paymentMethod });
+      }
+
+      // Close dialog
+      setShowPaymentDialog(false);
+      setPendingOrderForPayment(null);
+
+      // Print KOT after successful confirmation
+      try {
+        const order = await getOrderForKOT(pendingOrderForPayment);
+        const kotData = formatOrderForKOT(order);
+        
+        // Print 2 KOTs automatically
+        setTimeout(() => {
+          printMultipleKOTs(kotData, 2);
+          setPrintMessage('KOT printing initiated - 2 copies');
+          if (printMessageTimeoutRef.current) clearTimeout(printMessageTimeoutRef.current);
+          printMessageTimeoutRef.current = setTimeout(() => setPrintMessage(null), 3000);
+        }, 500);
+      } catch (kotError) {
+        console.error('Error printing KOT:', kotError);
+        // Don't fail the status update if KOT printing fails
+      }
+    } catch (err: any) {
+      console.error('Error updating order status or payment method:', err);
+      alert(`Failed to confirm order: ${err.message}`);
+    } finally {
+      setPaymentDialogLoading(false);
     }
   };
 
@@ -799,7 +846,7 @@ export default function OrdersPage() {
               {/* Payment Info */}
               <div className="mb-4">
                 <h4 className="text-sm font-medium text-gray-500 mb-2">Payment</h4>
-                <p>Method: {selectedOrder.payment_method === 'card' ? 'Card' : 'Cash'}</p>
+                <p>Method: {selectedOrder.payment_method === 'card' ? 'Card' : selectedOrder.payment_method === 'upi' ? 'UPI' : 'Cash'}</p>
                 {selectedOrder.payment_id && <p>Payment ID: {selectedOrder.payment_id}</p>}
                 {selectedOrder.payment_status && <p>Status: {selectedOrder.payment_status}</p>}
               </div>
@@ -919,6 +966,17 @@ export default function OrdersPage() {
           </div>
         </div>
       )}
+
+      {/* Payment Mode Dialog */}
+      <PaymentModeDialog
+        isOpen={showPaymentDialog}
+        onClose={() => {
+          setShowPaymentDialog(false);
+          setPendingOrderForPayment(null);
+        }}
+        onSelect={handlePaymentModeSelect}
+        isLoading={paymentDialogLoading}
+      />
     </div>
   );
 } 
